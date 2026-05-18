@@ -1,0 +1,176 @@
+[0m08:40:28.446261 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001CB878236E0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001CB84821280>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001CB87AA10A0>]}
+
+
+============================== 08:40:28.449777 | 181229dc-322e-4066-aa95-1f36105c391c ==============================
+[0m08:40:28.449777 [info ] [MainThread]: Running with dbt=1.12.0-b1
+[0m08:40:28.449777 [debug] [MainThread]: running dbt with arguments {'version_check': 'True', 'no_print': 'None', 'static_parser': 'True', 'target_path': 'None', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'printer_width': '80', 'write_json': 'True', 'introspect': 'True', 'log_cache_events': 'False', 'empty': 'None', 'cache_selected_only': 'False', 'fail_fast': 'False', 'debug': 'False', 'log_format': 'default', 'partial_parse': 'True', 'send_anonymous_usage_stats': 'True', 'quiet': 'False', 'warn_error': 'None', 'profiles_dir': 'C:\\Users\\HP\\.dbt', 'indirect_selection': 'eager', 'invocation_command': 'dbt init', 'use_colors': 'True', 'use_experimental_parser': 'False', 'log_path': 'logs'}
+[0m08:40:39.227964 [debug] [MainThread]: Starter project path: C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\dbt\include\starter_project
+[0m08:40:39.244910 [info ] [MainThread]: Setting up your profile.
+[0m08:40:49.301182 [error] [MainThread]: [[31mERROR[0m]: Encountered an error:
+
+[0m08:40:49.305182 [error] [MainThread]: Traceback (most recent call last):
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\dbt\cli\requires.py", line 184, in wrapper
+    result, success = func(*args, **kwargs)
+                      ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\dbt\cli\requires.py", line 130, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\dbt\cli\main.py", line 499, in init
+    results = task.run()
+              ^^^^^^^^^^
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\dbt\task\init.py", line 360, in run
+    self.setup_profile(profile_name)
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\dbt\task\init.py", line 264, in setup_profile
+    self.create_profile_from_target(adapter, profile_name=profile_name)
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\dbt\task\init.py", line 181, in create_profile_from_target
+    self.create_profile_from_profile_template(profile_template, profile_name)
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\dbt\task\init.py", line 165, in create_profile_from_profile_template
+    target = self.generate_target_from_input(prompts, initial_target)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\dbt\task\init.py", line 131, in generate_target_from_input
+    target[key] = click.prompt(
+                  ^^^^^^^^^^^^^
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\click\termui.py", line 218, in prompt
+    value = prompt_func(prompt)
+            ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\click\termui.py", line 201, in prompt_func
+    raise Abort() from None
+click.exceptions.Abort
+
+[0m08:40:49.306182 [debug] [MainThread]: Command `dbt init` failed at 08:40:49.306182 after 20.95 seconds
+[0m08:40:49.307178 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001CB870DC6E0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001CB88CF7DA0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001CB88DE8B60>]}
+[0m08:40:49.307178 [debug] [MainThread]: Flushing usage events
+[0m08:40:50.561181 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m08:41:04.804502 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001A80955ADE0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001A805D32FF0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001A809827B90>]}
+
+
+============================== 08:41:04.807508 | 5bb6e395-9cef-4271-afd0-420d1a8df254 ==============================
+[0m08:41:04.807508 [info ] [MainThread]: Running with dbt=1.12.0-b1
+[0m08:41:04.808506 [debug] [MainThread]: running dbt with arguments {'static_parser': 'True', 'no_print': 'None', 'version_check': 'True', 'target_path': 'None', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'printer_width': '80', 'write_json': 'True', 'empty': 'None', 'log_cache_events': 'False', 'introspect': 'True', 'cache_selected_only': 'False', 'log_format': 'default', 'debug': 'False', 'fail_fast': 'False', 'profiles_dir': 'C:\\Users\\HP\\.dbt', 'send_anonymous_usage_stats': 'True', 'quiet': 'False', 'warn_error': 'None', 'partial_parse': 'True', 'invocation_command': 'dbt init', 'indirect_selection': 'eager', 'use_colors': 'True', 'use_experimental_parser': 'False', 'log_path': 'logs'}
+[0m08:41:10.298157 [debug] [MainThread]: Starter project path: C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\dbt\include\starter_project
+[0m08:41:10.310265 [info ] [MainThread]: Setting up your profile.
+[0m08:42:06.481656 [error] [MainThread]: [[31mERROR[0m]: Encountered an error:
+
+[0m08:42:06.483669 [error] [MainThread]: Traceback (most recent call last):
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\dbt\cli\requires.py", line 184, in wrapper
+    result, success = func(*args, **kwargs)
+                      ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\dbt\cli\requires.py", line 130, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\dbt\cli\main.py", line 499, in init
+    results = task.run()
+              ^^^^^^^^^^
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\dbt\task\init.py", line 360, in run
+    self.setup_profile(profile_name)
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\dbt\task\init.py", line 264, in setup_profile
+    self.create_profile_from_target(adapter, profile_name=profile_name)
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\dbt\task\init.py", line 181, in create_profile_from_target
+    self.create_profile_from_profile_template(profile_template, profile_name)
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\dbt\task\init.py", line 165, in create_profile_from_profile_template
+    target = self.generate_target_from_input(prompts, initial_target)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\dbt\task\init.py", line 131, in generate_target_from_input
+    target[key] = click.prompt(
+                  ^^^^^^^^^^^^^
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\click\termui.py", line 218, in prompt
+    value = prompt_func(prompt)
+            ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\click\termui.py", line 201, in prompt_func
+    raise Abort() from None
+click.exceptions.Abort
+
+[0m08:42:06.484660 [debug] [MainThread]: Command `dbt init` failed at 08:42:06.484660 after 61.77 seconds
+[0m08:42:06.484660 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001A809642CF0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001A80B16F0E0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001A80AE082F0>]}
+[0m08:42:06.484660 [debug] [MainThread]: Flushing usage events
+[0m08:42:07.823736 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m08:43:28.667215 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000028FE3F23170>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000028FE37026F0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000028FE3702B40>]}
+
+
+============================== 08:43:28.671231 | 063ebf0f-35b4-4f6c-952a-4fb7c21873f9 ==============================
+[0m08:43:28.671231 [info ] [MainThread]: Running with dbt=1.12.0-b1
+[0m08:43:28.671231 [debug] [MainThread]: running dbt with arguments {'static_parser': 'True', 'no_print': 'None', 'version_check': 'True', 'target_path': 'None', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'printer_width': '80', 'write_json': 'True', 'empty': 'None', 'log_cache_events': 'False', 'introspect': 'True', 'cache_selected_only': 'False', 'log_format': 'default', 'debug': 'False', 'fail_fast': 'False', 'profiles_dir': 'C:\\Users\\HP\\.dbt', 'send_anonymous_usage_stats': 'True', 'quiet': 'False', 'warn_error': 'None', 'partial_parse': 'True', 'invocation_command': 'dbt init', 'use_colors': 'True', 'indirect_selection': 'eager', 'use_experimental_parser': 'False', 'log_path': 'logs'}
+[0m08:43:35.794620 [debug] [MainThread]: Starter project path: C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Lib\site-packages\dbt\include\starter_project
+[0m08:43:35.813501 [info ] [MainThread]: Setting up your profile.
+[0m08:48:35.182226 [info ] [MainThread]: Profile banking_data_pipeline written to C:\Users\HP\.dbt\profiles.yml using target's profile_template.yml and your supplied values.
+[0m08:48:35.184228 [info ] [MainThread]: Running dbt debug to validate the project...
+[0m08:48:35.185226 [info ] [MainThread]: dbt version: 1.12.0-b1
+[0m08:48:35.185867 [info ] [MainThread]: python version: 3.12.6
+[0m08:48:35.185867 [info ] [MainThread]: python path: C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_env\Scripts\python.exe
+[0m08:48:35.185867 [info ] [MainThread]: os info: Windows-11-10.0.26200-SP0
+[0m08:48:35.223007 [info ] [MainThread]: Using profiles dir at C:\Users\HP\.dbt
+[0m08:48:35.223512 [info ] [MainThread]: Using profiles.yml file at C:\Users\HP\.dbt\profiles.yml
+[0m08:48:35.223512 [info ] [MainThread]: Using dbt_project.yml file at C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\include\dbt\banking_data_pipeline\dbt_project.yml
+[0m08:48:35.223512 [info ] [MainThread]: adapter type: bigquery
+[0m08:48:35.224517 [info ] [MainThread]: adapter version: 1.11.1
+[0m08:48:35.292194 [info ] [MainThread]: Configuration:
+[0m08:48:35.292194 [info ] [MainThread]:   profiles.yml file [[32mOK found and valid[0m]
+[0m08:48:35.293187 [info ] [MainThread]:   dbt_project.yml file [[32mOK found and valid[0m]
+[0m08:48:35.293187 [info ] [MainThread]: Required dependencies:
+[0m08:48:35.293187 [debug] [MainThread]: Executing "git --help"
+[0m08:48:35.339421 [debug] [MainThread]: STDOUT: "b"usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]\n           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]\n           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--no-lazy-fetch]\n           [--no-optional-locks] [--no-advice] [--bare] [--git-dir=<path>]\n           [--work-tree=<path>] [--namespace=<name>] [--config-env=<name>=<envvar>]\n           <command> [<args>]\n\nThese are common Git commands used in various situations:\n\nstart a working area (see also: git help tutorial)\n   clone      Clone a repository into a new directory\n   init       Create an empty Git repository or reinitialize an existing one\n\nwork on the current change (see also: git help everyday)\n   add        Add file contents to the index\n   mv         Move or rename a file, a directory, or a symlink\n   restore    Restore working tree files\n   rm         Remove files from the working tree and from the index\n\nexamine the history and state (see also: git help revisions)\n   bisect     Use binary search to find the commit that introduced a bug\n   diff       Show changes between commits, commit and working tree, etc\n   grep       Print lines matching a pattern\n   log        Show commit logs\n   show       Show various types of objects\n   status     Show the working tree status\n\ngrow, mark and tweak your common history\n   backfill   Download missing objects in a partial clone\n   branch     List, create, or delete branches\n   commit     Record changes to the repository\n   merge      Join two or more development histories together\n   rebase     Reapply commits on top of another base tip\n   reset      Set `HEAD` or the index to a known state\n   switch     Switch branches\n   tag        Create, list, delete or verify tags\n\ncollaborate (see also: git help workflows)\n   fetch      Download objects and refs from another repository\n   pull       Fetch from and integrate with another repository or a local branch\n   push       Update remote refs along with associated objects\n\n'git help -a' and 'git help -g' list available subcommands and some\nconcept guides. See 'git help <command>' or 'git help <concept>'\nto read about a specific subcommand or concept.\nSee 'git help git' for an overview of the system.\n""
+[0m08:48:35.339421 [debug] [MainThread]: STDERR: "b''"
+[0m08:48:35.339421 [info ] [MainThread]:  - git [[32mOK found[0m]
+
+[0m08:48:35.340429 [info ] [MainThread]: Connection:
+[0m08:48:35.340429 [info ] [MainThread]:   method: service-account
+[0m08:48:35.341425 [info ] [MainThread]:   database: banking-data
+[0m08:48:35.341425 [info ] [MainThread]:   execution_project: banking-data
+[0m08:48:35.341425 [info ] [MainThread]:   schema: staging
+[0m08:48:35.341425 [info ] [MainThread]:   location: US
+[0m08:48:35.342425 [info ] [MainThread]:   priority: interactive
+[0m08:48:35.342425 [info ] [MainThread]:   maximum_bytes_billed: None
+[0m08:48:35.342425 [info ] [MainThread]:   impersonate_service_account: None
+[0m08:48:35.343427 [info ] [MainThread]:   job_retry_deadline_seconds: None
+[0m08:48:35.343427 [info ] [MainThread]:   job_retries: 1
+[0m08:48:35.343427 [info ] [MainThread]:   job_creation_timeout_seconds: None
+[0m08:48:35.343427 [info ] [MainThread]:   job_execution_timeout_seconds: 300
+[0m08:48:35.344425 [info ] [MainThread]:   timeout_seconds: 300
+[0m08:48:35.344425 [info ] [MainThread]:   client_id: None
+[0m08:48:35.344425 [info ] [MainThread]:   token_uri: None
+[0m08:48:35.345424 [info ] [MainThread]:   compute_region: None
+[0m08:48:35.345424 [info ] [MainThread]:   dataproc_cluster_name: None
+[0m08:48:35.345424 [info ] [MainThread]:   gcs_bucket: None
+[0m08:48:35.345424 [info ] [MainThread]:   dataproc_batch: None
+[0m08:48:35.345424 [info ] [MainThread]: Registered adapter: bigquery=1.11.1
+[0m08:48:35.583371 [debug] [MainThread]: Acquiring new bigquery connection 'debug'
+[0m08:48:35.583371 [debug] [MainThread]: On debug: select 1 as id
+[0m08:48:35.584371 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m08:48:35.584371 [debug] [MainThread]: BigQuery adapter: Got an error when attempting to create a bigquery " "client: '[Errno 13] Permission denied: 'C:\\Users\\HP\\Documents\\GitHub\\banking-transaction-data-pipeline\\include''
+[0m08:48:35.584371 [debug] [MainThread]: BigQuery adapter: Unhandled error while running:
+select 1 as id
+[0m08:48:35.584371 [debug] [MainThread]: BigQuery adapter: Database Error
+  [Errno 13] Permission denied: 'C:\\Users\\HP\\Documents\\GitHub\\banking-transaction-data-pipeline\\include'
+[0m08:48:35.584371 [info ] [MainThread]:   Connection test: [[31mERROR[0m]
+
+[0m08:48:35.585378 [info ] [MainThread]: [31m1 check failed:[0m
+[0m08:48:35.585378 [info ] [MainThread]: dbt was unable to connect to the specified database.
+The database returned the following error:
+
+  >'NoneType' object has no attribute 'close'
+
+Check your database credentials and try again. For more information, visit:
+https://docs.getdbt.com/docs/configure-your-profile
+
+
+[0m08:48:35.585378 [info ] [MainThread]: Your new dbt project "banking_data_pipeline" was created!
+Initialized new project in C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\include\dbt\banking_data_pipeline\banking_data_pipeline
+
+For more information on how to configure the profiles.yml file,
+please consult the dbt documentation here:
+
+  https://docs.getdbt.com/docs/configure-your-profile
+
+One more thing:
+
+Need help? Don't hesitate to reach out to us via GitHub issues or on Slack:
+
+  https://community.getdbt.com/
+
+Happy modeling!
+
+[0m08:48:35.586371 [info ] [MainThread]: [31mYour profile may need adjustments. You can find the logs of `dbt debug` above[0m
+[0m08:48:35.586371 [debug] [MainThread]: Command `dbt init` succeeded at 08:48:35.586371 after 307.02 seconds
+[0m08:48:35.586371 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000028FE35573E0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000028F947D1A30>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000028FE40B9FA0>]}
+[0m08:48:35.587370 [debug] [MainThread]: Flushing usage events
+[0m08:48:37.032095 [debug] [MainThread]: An error was encountered while trying to flush usage events
