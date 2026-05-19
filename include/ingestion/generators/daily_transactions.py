@@ -1,40 +1,42 @@
-import pandas as pd
-import numpy as np
+import io
+import os
 import uuid
-from datetime import datetime
 import logging
+import numpy as np
+import pandas as pd
+import boto3
 
 logger = logging.getLogger(__name__)
 
-def generate_daily_transactions(execution_date: str) -> str:
+def generate_and_stream_daily_transactions(execution_date: str, run_id: str) -> str:
     """
-    Production Daily Generator: Jenis data ketat & optimasi memori (snappy compression).
+    Zero-Disk Daily Ingestion: Jana data terus ke dalam RAM (BytesIO) 
+    dan stream terus ke AWS S3.
     """
-    try:
-        dt_obj = datetime.strptime(execution_date, '%Y-%m-%d')
-    except ValueError:
-        raise ValueError(f"Format execution_date wajib YYYY-MM-DD: {execution_date}")
-
     num_records = 5000
-    
     df = pd.DataFrame({
         "transaction_id": [str(uuid.uuid4()) for _ in range(num_records)],
         "account_id": np.random.randint(10000, 99999, num_records).astype(np.int32),
         "amount": np.round(np.random.uniform(10.0, 5000.0, num_records), 2).astype(np.float32),
         "currency": np.random.choice(["MYR", "USD", "SGD", "EUR"], num_records),
-        "transaction_date": [dt_obj.strftime('%Y-%m-%d %H:%M:%S')] * num_records,
+        "transaction_date": [f"{execution_date} 12:00:00"] * num_records,
         "status": np.random.choice(["COMPLETED", "PENDING", "FAILED"], num_records, p=[0.8, 0.15, 0.05])
     })
 
-    # Enforce schemas & data compression efficiency
-    df = df.astype({
-        "transaction_id": "string",
-        "currency": "category",
-        "transaction_date": "datetime64[ns]",
-        "status": "category"
-    })
+    # 1. Tukar DataFrame ke format Parquet di dalam RAM
+    parquet_buffer = io.BytesIO()
+    df.to_parquet(parquet_buffer, index=False, compression='snappy')
+    parquet_buffer.seek(0)
 
-    file_path = f"/tmp/daily_tx_{dt_obj.strftime('%Y%m%d')}.parquet"
-    df.to_parquet(file_path, index=False, compression='snappy')
-    logger.info(f"Berjaya menjana data harian di {file_path}")
-    return file_path
+    # 2. Stream terus ke S3 tanpa tulis fail ke disk
+    s3_client = boto3.client('s3')
+    s3_key = f"raw/transactions/dt={execution_date}/run_{run_id}.parquet"
+    
+    s3_client.put_object(
+        Bucket=os.getenv("S3_BUCKET_NAME"),
+        Key=s3_key,
+        Body=parquet_buffer.getvalue()
+    )
+    
+    logger.info(f"⚡ [RAM Stream] Sukses menghantar daily transaksi ke S3: {s3_key}")
+    return s3_key

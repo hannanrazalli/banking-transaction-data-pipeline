@@ -14,3 +14,4 @@ dbt_env/
 .env
 __pycache__/
 *.pyc
+include\banking-data-496700-68b15bc6fe66.json
