@@ -14,3 +14,11 @@ models:
     1_staging:
       +schema: bronze
       +materialized: view # Staging digalakkan guna View untuk jimat kos BigQuery
+
+    2_intermediate:
+      +schema: silver
+      +materialized: view
+
+    3_marts:
+      +schema: gold
+      +materialized: view
