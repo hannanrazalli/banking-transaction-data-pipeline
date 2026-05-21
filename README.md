@@ -59,3 +59,16 @@ astro dev start
 
 **4. Access Airflow UI:**
 Navigate to http://localhost:8080 (Default credentials: admin/admin).
+
+
+## 📊 Pipeline Visualizations & Proof of Execution
+
+### 1. dbt Medallion Architecture Lineage Graph
+This graph illustrates the modular dependency and data flow from raw staging tables to downstream analytical marts inside Google BigQuery:
+
+![dbt Medallion Lineage Graph](image/airflow.png)
+
+### 2. Airflow Production DAGs (Successful Runs)
+Proof of execution for all 5 production and historical backfill DAGs running successfully within the Astro Runtime environment:
+
+![Airflow DAG Success Run](image/medallion_graph.png)
