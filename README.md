@@ -44,12 +44,15 @@ Avoided BigQuery External Tables for transactional data. Instead, Python `BigQue
 ├── requirements.txt                # Python dependencies
 └── Dockerfile                      # Astro Runtime custom image
 
+```
 
 🚀 How to Run Locally
 
 **1. Clone the repository:**
-git clone https://github.com/hannanrazalli/banking-transaction-data-pipeline.git
+```bash
+git clone [https://github.com/hannanrazalli/banking-transaction-data-pipeline.git](https://github.com/hannanrazalli/banking-transaction-data-pipeline.git)
 cd banking-transaction-data-pipeline
+```
 
 **2. Environment Variables:**
 Create a .env file in the root directory and configure your cloud credentials securely (Do not commit your GCP JSON key).
