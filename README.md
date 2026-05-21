@@ -1,45 +1,61 @@
-Overview
-========
+# Event-Driven Banking Data Pipeline (Medallion Architecture)
 
-Welcome to Astronomer! This project was generated after you ran 'astro dev init' using the Astronomer CLI. This readme describes the contents of the project, as well as how to run Apache Airflow on your local machine.
+## 📌 Overview
+This repository contains an end-to-end, event-driven data pipeline designed to process daily banking transactions and forex data. Built with scalability and fault-tolerance in mind, the pipeline orchestrates data extraction from cloud storage (AWS S3) and transforms it within a data warehouse (Google BigQuery) using a strict Medallion Architecture (Bronze -> Silver -> Gold).
 
-Project Contents
-================
+## 🏗️ Architecture & Tech Stack
+*(Insert your Architecture Diagram here using Draw.io or Excalidraw)*
 
-Your Astro project contains the following files and folders:
+* **Orchestration:** Apache Airflow (Astronomer Cosmos)
+* **Data Warehouse:** Google BigQuery (Native Tables)
+* **Data Lake / Object Storage:** AWS S3
+* **Transformation:** dbt (Data Build Tool)
+* **Language:** Python, SQL (Jinja)
 
-- dags: This folder contains the Python files for your Airflow DAGs. By default, this directory includes one example DAG:
-    - `example_astronauts`: This DAG shows a simple ETL pipeline example that queries the list of astronauts currently in space from the Open Notify API and prints a statement for each astronaut. The DAG uses the TaskFlow API to define tasks in Python, and dynamic task mapping to dynamically print a statement for each astronaut. For more on how this DAG works, see our [Getting started tutorial](https://www.astronomer.io/docs/learn/get-started-with-airflow).
-- Dockerfile: This file contains a versioned Astro Runtime Docker image that provides a differentiated Airflow experience. If you want to execute other commands or overrides at runtime, specify them here.
-- include: This folder contains any additional files that you want to include as part of your project. It is empty by default.
-- packages.txt: Install OS-level packages needed for your project by adding them to this file. It is empty by default.
-- requirements.txt: Install Python packages needed for your project by adding them to this file. It is empty by default.
-- plugins: Add custom or community plugins for your project to this file. It is empty by default.
-- airflow_settings.yaml: Use this local-only file to specify Airflow Connections, Variables, and Pools instead of entering them in the Airflow UI as you develop DAGs in this project.
+## ⚙️ Key Architectural Decisions
 
-Deploy Your Project Locally
-===========================
+As a data engineering project aimed at production-grade reliability, several senior-level design patterns were implemented:
 
-Start Airflow on your local machine by running 'astro dev start'.
+**1. Decoupled EL & T Pipelines**
+Ingestion (Extract & Load) and Transformation workflows are physically separated into distinct DAGs. If the dbt transformation fails due to a schema drift, the ingestion DAG will continue to land raw data safely into the Bronze layer, preventing data loss and ensuring fault tolerance.
 
-This command will spin up five Docker containers on your machine, each for a different Airflow component:
+**2. Data-Aware Scheduling (Event-Driven)**
+Instead of relying on fragile cron-based time schedules (Time-Driven), this pipeline utilizes **Airflow Datasets**. The `medallion_banking` DAG is configured to trigger *only* and *immediately* after the `s3_to_bq` ingestion DAG successfully completes. This prevents blind runs and guarantees data integrity.
 
-- Postgres: Airflow's Metadata Database
-- Scheduler: The Airflow component responsible for monitoring and triggering tasks
-- DAG Processor: The Airflow component responsible for parsing DAGs
-- API Server: The Airflow component responsible for serving the Airflow UI and API
-- Triggerer: The Airflow component responsible for triggering deferred tasks
+**3. Idempotency & Incremental Processing**
+* **Idempotency:** Re-running the pipeline multiple times for the same day will not duplicate records in the Gold layer. `MERGE/UPSERT` strategies are enforced using unique composite keys (`transaction_id`).
+* **Incremental Loading:** Configured dbt materializations to perform full-refreshes in `dev` environments, but strict incremental loads in `prod` environments (`"full_refresh": not IS_PROD`), heavily optimizing BigQuery compute costs.
 
-When all five containers are ready the command will open the browser to the Airflow UI at http://localhost:8080/. You should also be able to access your Postgres Database at 'localhost:5432/postgres' with username 'postgres' and password 'postgres'.
+**4. Optimized BigQuery Storage**
+Avoided BigQuery External Tables for transactional data. Instead, Python `BigQueryHook` (with `WRITE_APPEND`) is used to write data physically into BigQuery Native Tables at the Bronze layer, significantly improving query performance and enabling future clustering/partitioning.
 
-Note: If you already have either of the above ports allocated, you can either [stop your existing Docker containers or change the port](https://www.astronomer.io/docs/astro/cli/troubleshoot-locally#ports-are-not-available-for-my-local-airflow-webserver).
+## 📂 Repository Structure
+```text
+.
+├── dags/
+│   ├── historical_to_s3.py         # One-off backfill DAG
+│   ├── historical_s3_to_bq.py      # One-off backfill DAG
+│   ├── daily_to_s3.py              # Daily incremental extraction to S3
+│   ├── s3_to_bq.py                 # Ingestion from S3 to BigQuery (Emits Airflow Dataset)
+│   └── medallion_banking.py        # Astronomer Cosmos DAG for dbt models
+├── include/
+│   ├── ingestion/                  # Custom Python loaders and extractors
+│   └── dbt/banking_data_pipeline/  # dbt project (models, macros, tests)
+├── requirements.txt                # Python dependencies
+└── Dockerfile                      # Astro Runtime custom image
 
-Deploy Your Project to Astronomer
-=================================
 
-If you have an Astronomer account, pushing code to a Deployment on Astronomer is simple. For deploying instructions, refer to Astronomer documentation: https://www.astronomer.io/docs/astro/deploy-code/
+🚀 How to Run Locally
 
-Contact
-=======
+**1. Clone the repository:**
+git clone https://github.com/hannanrazalli/banking-transaction-data-pipeline.git
+cd banking-transaction-data-pipeline
 
-The Astronomer CLI is maintained with love by the Astronomer team. To report a bug or suggest a change, reach out to our support.
+**2. Environment Variables:**
+Create a .env file in the root directory and configure your cloud credentials securely (Do not commit your GCP JSON key).
+
+**3. Start the Airflow Cluster:**
+astro dev start
+
+**4. Access Airflow UI:**
+Navigate to http://localhost:8080 (Default credentials: admin/admin).
