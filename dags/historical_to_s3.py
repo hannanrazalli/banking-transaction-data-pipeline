@@ -1,5 +1,5 @@
 from airflow import DAG
-from airflow.providers.standard.operators.python import PythonOperator
+from airflow.operators.python import PythonOperator
 from datetime import datetime
 
 from include.ingestion.generators.historical_transactions import generate_and_stream_historical_transactions
@@ -30,5 +30,9 @@ with DAG(
     task_hist_forex = PythonOperator(
         task_id='historical_forex_to_s3',
         python_callable=fetch_and_stream_historical_forex,
-        op_kwargs={'date': HISTORICAL_DATE_FOREX, 'run_id': '{{ run_id }}'}
+        op_kwargs={
+            'start_date': '2026-01-01', 
+            'end_date': '2026-05-19', 
+            'run_id': '{{ run_id }}'
+        }
     )
