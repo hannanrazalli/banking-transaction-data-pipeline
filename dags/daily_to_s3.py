@@ -1,6 +1,6 @@
 import os
 from airflow import DAG
-from airflow.providers.standard.operators.python import PythonOperator
+from airflow.operators.python import PythonOperator
 from datetime import datetime
 
 from include.ingestion.generators.daily_transactions import generate_and_stream_daily_transactions
