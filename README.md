@@ -1,10 +1,10 @@
-# Event-Driven Banking Data Pipeline (Medallion Architecture)
+# Data-Aware Banking Data Pipeline (Medallion Architecture)
 
 ## 📌 Overview
-This repository contains an end-to-end, event-driven data pipeline designed to process daily banking transactions and forex data. Built with scalability and fault-tolerance in mind, the pipeline orchestrates data extraction from cloud storage (AWS S3) and transforms it within a data warehouse (Google BigQuery) using a strict Medallion Architecture (Bronze -> Silver -> Gold).
+This project is a portfolio-focused data engineering pipeline designed to process daily banking transactions and forex data. It was built using modern data engineering practices commonly found in production-oriented analytics platforms, orchestrating data extraction from cloud storage (AWS S3) and transforming it within Google BigQuery using a Medallion Architecture approach (Bronze -> Silver -> Gold).
 
 ## 🏗️ Architecture & Tech Stack
-*(Insert your Architecture Diagram here using Draw.io or Excalidraw)*
+*(Insert your Architecture Diagram here using Excalidraw / Draw.io)*
 
 * **Orchestration:** Apache Airflow (Astronomer Cosmos)
 * **Data Warehouse:** Google BigQuery (Native Tables)
@@ -14,21 +14,20 @@ This repository contains an end-to-end, event-driven data pipeline designed to p
 
 ## ⚙️ Key Architectural Decisions
 
-As a data engineering project aimed at production-grade reliability, several senior-level design patterns were implemented:
+As a portfolio-focused data engineering project designed around modern industry practices, several production-oriented design patterns were implemented:
 
 **1. Decoupled EL & T Pipelines**
-Ingestion (Extract & Load) and Transformation workflows are physically separated into distinct DAGs. If the dbt transformation fails due to a schema drift, the ingestion DAG will continue to land raw data safely into the Bronze layer, preventing data loss and ensuring fault tolerance.
+Ingestion (Extract & Load) and Transformation workflows are physically separated into distinct DAGs. If the dbt transformation fails due to upstream schema drift, the ingestion DAG will continue to land raw data safely into the Bronze layer, improving pipeline resiliency and reducing the risk of data loss.
 
-**2. Data-Aware Scheduling (Event-Driven)**
-Instead of relying on fragile cron-based time schedules (Time-Driven), this pipeline utilizes **Airflow Datasets**. The `medallion_banking` DAG is configured to trigger *only* and *immediately* after the `s3_to_bq` ingestion DAG successfully completes. This prevents blind runs and guarantees data integrity.
+**2. Data-Aware Scheduling**
+Instead of relying on fragile cron-based time schedules, this pipeline utilizes **Airflow Datasets**. The `medallion_banking` DAG is configured to run automatically after the `s3_to_bq` ingestion DAG successfully completes. This creates a logical dependency that prevents blind runs and helps ensure data readiness.
 
 **3. Idempotency & Incremental Processing**
-* **Idempotency:** Re-running the pipeline multiple times for the same day will not duplicate records in the Gold layer. `MERGE/UPSERT` strategies are enforced using unique composite keys (`transaction_id`).
-* **Incremental Loading:** Configured dbt materializations to perform full-refreshes in `dev` environments, but strict incremental loads in `prod` environments (`"full_refresh": not IS_PROD`), heavily optimizing BigQuery compute costs.
+* **Idempotency:** Re-running the pipeline for the same execution date handles duplicate records effectively. `MERGE/UPSERT` strategies are enforced using unique composite keys (`transaction_id`).
+* **Incremental Loading:** Configured dbt materializations to perform full-refreshes in local environments while primarily using incremental loading strategies through environment-based configurations (`"full_refresh": not IS_PROD`), helping optimize BigQuery compute costs.
 
 **4. Optimized BigQuery Storage**
-Avoided BigQuery External Tables for transactional data. Instead, Python `BigQueryHook` (with `WRITE_APPEND`) is used to write data physically into BigQuery Native Tables at the Bronze layer, significantly improving query performance and enabling future clustering/partitioning.
-
+Avoided BigQuery External Tables for transactional data. Instead, Python's `BigQueryHook` (with `WRITE_APPEND`) is used to write data physically into BigQuery Native Tables at the Bronze layer, improving query performance for downstream analytical workloads.
 ## 📂 Repository Structure
 ```text
 .
@@ -50,7 +49,7 @@ Avoided BigQuery External Tables for transactional data. Instead, Python `BigQue
 
 **1. Clone the repository:**
 ```bash
-git clone [https://github.com/hannanrazalli/banking-transaction-data-pipeline.git](https://github.com/hannanrazalli/banking-transaction-data-pipeline.git)
+git clone https://github.com/hannanrazalli/banking-transaction-data-pipeline.git
 cd banking-transaction-data-pipeline
 ```
 
@@ -58,7 +57,9 @@ cd banking-transaction-data-pipeline
 Create a .env file in the root directory and configure your cloud credentials securely (Do not commit your GCP JSON key).
 
 **3. Start the Airflow Cluster:**
+```bash
 astro dev start
+```
 
 **4. Access Airflow UI:**
 Navigate to http://localhost:8080 (Default credentials: admin/admin).
@@ -71,7 +72,7 @@ This graph illustrates the modular dependency and data flow from raw staging tab
 
 ![dbt Medallion Lineage Graph](images/medallion_graph.png)
 
-### 2. Airflow Production DAGs (Successful Runs)
-Proof of execution for all 5 production and historical backfill DAGs running successfully within the Astro Runtime environment:
+### 2. Orchestration DAGs (Successful Runs)
+Proof of execution for all historical and daily pipeline DAGs running successfully within the local Astro Runtime environment:
 
 ![Airflow DAG Success Run](images/airflow.png)
