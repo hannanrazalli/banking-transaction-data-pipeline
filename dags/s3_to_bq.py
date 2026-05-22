@@ -1,6 +1,14 @@
+"""
+DAG: s3_to_bq
+Description: 
+    Daily ingestion DAG. Moves incremental daily data from AWS S3 landing zone 
+    into Google BigQuery (Bronze layer) native tables.
+    Emits an Airflow Dataset ('bq_raw_ready') upon successful completion to 
+    automatically trigger downstream dbt transformations (Medallion architecture).
+"""
+
 import sys
 import os
-# Trik Senior: Paksa Python kenal folder root projek (/usr/local/airflow)
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from datetime import datetime
@@ -14,7 +22,7 @@ from include.ingestion.loaders.load_s3_bq import sync_tx_to_bq, sync_forex_to_bq
 bq_raw_ready = Dataset("bigquery://banking_raw/data_ready")
 
 default_args = {
-    'owner': 'tier1_data_engineer',
+    'owner': 'hannan_razalli',
     'depends_on_past': False,
     'retries': 2,
 }

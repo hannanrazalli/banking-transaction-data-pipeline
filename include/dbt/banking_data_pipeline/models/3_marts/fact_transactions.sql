@@ -23,11 +23,10 @@ WITH silver_transactions AS (
 
 final_fact AS (
     SELECT
-        transaction_id, -- Natural Key dikekalkan (Tak perlu Hash Key)
+        transaction_id,
         account_id,
         transaction_date,
         
-        -- BIG TECH STANDARD: Generate the same Hash Key to act as Foreign Key to Dim
         {{ dbt_utils.generate_surrogate_key(['DATE(transaction_date)', 'original_currency']) }} AS forex_sk,
         
         original_amount,

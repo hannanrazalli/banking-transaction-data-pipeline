@@ -8,7 +8,6 @@ WITH silver_forex AS (
 
 generate_surrogate_key AS (
     SELECT
-        -- BIG TECH STANDARD: Generate Hash Key (Surrogate Key) based on unique attributes
         {{ dbt_utils.generate_surrogate_key(['forex_date', 'base_currency']) }} AS forex_sk,
         
         forex_date,

@@ -1,3 +1,11 @@
+"""
+DAG: daily_to_s3
+Description: 
+    Extracts daily incremental banking transactions and forex data from external APIs 
+    and loads them into AWS S3 (Raw/Landing Zone). Scheduled to run daily.
+    Serves as the first step in the ELT pipeline.
+"""
+
 import os
 from airflow import DAG
 from airflow.operators.python import PythonOperator
@@ -14,7 +22,7 @@ with DAG(
     tags=['production', 'zero-disk'],
 ) as dag:
 
-    # Task terus jana dan upload serentak (1 Task sahaja per entiti!)
+    # Create dan upload serentak (1 Task sahaja per entiti!)
     task_tx = PythonOperator(
         task_id='daily_transactions_to_s3',
         python_callable=generate_and_stream_daily_transactions,

@@ -1,3 +1,12 @@
+"""
+DAG: historical_to_s3
+Description: 
+    One-off backfill DAG for data extraction.
+    Pulls historical transaction and forex data spanning past periods from source APIs
+    and lands the bulk files into AWS S3. 
+    Should be paused after the initial historical load is complete.
+"""
+
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
@@ -5,7 +14,6 @@ from datetime import datetime
 from include.ingestion.generators.historical_transactions import generate_and_stream_historical_transactions
 from include.ingestion.api.historical_forex_api import fetch_and_stream_historical_forex
 
-# Kehendak baru: Data paling lama bermula dari 1 Jan 2025 sahaja
 START_DATE = '2025-01-01'
 HISTORICAL_DATE_FOREX = '2025-01-01'
 

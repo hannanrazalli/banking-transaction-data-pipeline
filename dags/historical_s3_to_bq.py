@@ -1,14 +1,21 @@
+"""
+DAG: historical_s3_to_bq
+Description: 
+    One-off backfill DAG for historical data ingestion. 
+    Reads bulk historical transaction and forex files from AWS S3 and loads them 
+    physically into Google BigQuery native tables (Bronze layer) using WRITE_APPEND.
+    Should be paused after the initial historical load is complete.
+"""
+
 import sys
 import os
-# Trik Senior: Paksa Python kenal folder root projek (/usr/local/airflow)
+# Paksa Python kenal folder root projek (/usr/local/airflow)
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import boto3
 from datetime import datetime
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-
-# Import fungsi dari loader utama
 from include.ingestion.loaders.load_s3_bq import sync_tx_to_bq, sync_forex_to_bq
 
 def bulk_load_historical_tx_from_s3():
@@ -39,13 +46,12 @@ def bulk_load_historical_forex_from_s3():
         if 'Contents' in page:
             for obj in page['Contents']:
                 key = obj['Key']
-                # Tapis hanya fail JSON
                 if key.endswith('.json'):
                     sync_forex_to_bq(s3_key=key)
 
 with DAG(
     dag_id='historical_s3_to_bq',
-    schedule=None,  # Larian manual sahaja
+    schedule=None,
     start_date=datetime(2025, 1, 1),
     catchup=False,
     tags=['production', 'bigquery', 'backfill'],

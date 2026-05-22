@@ -7,11 +7,9 @@ WITH fact_data AS (
 )
 
 SELECT 
-    -- Ekstrak Tahun dan Bulan untuk laporan bulanan
     FORMAT_TIMESTAMP('%Y-%m', transaction_date) AS transaction_month,
     original_currency,
     
-    -- Metrik Perniagaan
     COUNT(transaction_id) AS total_transactions,
     ROUND(SUM(amount_myr), 2) AS total_revenue_myr,
     
