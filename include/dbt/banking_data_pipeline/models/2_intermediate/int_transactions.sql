@@ -13,7 +13,6 @@ WITH clean_transactions AS (
     SELECT * FROM {{ ref('stg_transactions') }}
     WHERE _record_status = 'CLEAN'
     
-    -- Mengambil data baharu dan buffer 1 hari ke belakang
     {% if is_incremental() %}
         AND _ingest_at >= (
             SELECT TIMESTAMP_SUB(MAX(tx_ingest_at), INTERVAL 1 DAY) 
@@ -23,7 +22,6 @@ WITH clean_transactions AS (
 ),
 
 deduped_transactions AS (
-    -- Memastikan tiada data bertindih walaupun Airflow ter-run banyak kali
     SELECT *
     FROM clean_transactions
     QUALIFY ROW_NUMBER() OVER (PARTITION BY transaction_id ORDER BY _ingest_at DESC) = 1
@@ -53,7 +51,6 @@ joined_data AS (
         
         t.status,
         
-        -- Explicit Soft Delete (Paling Pro untuk kes ini)
         CASE 
             WHEN t.status = 'CANCELLED' THEN TRUE
             ELSE FALSE

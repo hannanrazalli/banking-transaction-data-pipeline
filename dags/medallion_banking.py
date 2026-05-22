@@ -1,3 +1,12 @@
+"""
+DAG: medallion_banking
+Description: 
+    Data-aware transformation DAG powered by Astronomer Cosmos and dbt.
+    Triggered automatically by Airflow Datasets when the Bronze layer is updated.
+    Executes the Medallion Architecture data modeling (Staging -> Intermediate -> Marts).
+    Utilizes incremental materializations in production and full-refreshes in dev environments.
+"""
+
 import os
 from datetime import datetime
 from pathlib import Path

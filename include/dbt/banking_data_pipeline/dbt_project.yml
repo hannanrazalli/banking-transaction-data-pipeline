@@ -2,18 +2,17 @@ name: 'banking_data_pipeline'
 version: '1.0.0'
 config-version: 2
 
-profile: 'banking_data_pipeline' # Pastikan profile dbt kau di set ke default atau nama profile BQ kau
+profile: 'banking_data_pipeline'
 
 model-paths: ["models"]
 macro-paths: ["macros"]
 
-# Tetapan lalai (default) untuk semua model
 models:
   banking_data_pipeline:
-    # Semua jadual/view di dalam folder 1_staging akan masuk ke dataset 'bronze'
+    
     1_staging:
       +schema: bronze
-      +materialized: view # Staging digalakkan guna View untuk jimat kos BigQuery
+      +materialized: view
 
     2_intermediate:
       +schema: silver

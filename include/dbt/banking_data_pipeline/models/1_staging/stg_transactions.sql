@@ -8,7 +8,6 @@ WITH raw_data AS (
 )
 
 SELECT
-    -- Pengekalan lajur asal
     transaction_id,
     account_id,
     CAST(amount AS FLOAT64) AS amount,
@@ -16,10 +15,8 @@ SELECT
     CAST(transaction_date AS TIMESTAMP) AS transaction_date,
     UPPER(TRIM(status)) AS status,
     
-    -- Lajur Audit Ingestion dari S3
     _ingest_at,
 
-    -- Data Quality Gatekeeper: Menanda rekod sihat dan sakit
     CASE
         WHEN transaction_id IS NULL OR transaction_id = '' THEN 'CORRUPT'
         WHEN account_id IS NULL THEN 'CORRUPT'
@@ -30,7 +27,6 @@ SELECT
         ELSE 'CLEAN'
     END AS _record_status,
 
-    -- Suntikan Macro Audit dbt
     {{ audit_columns('bronze') }}
 
 FROM raw_data
