@@ -8,7 +8,7 @@ import boto3
 
 logger = logging.getLogger(__name__)
 
-def generate_and_stream_daily_transactions(execution_date: str, run_id: str) -> str:
+def daily_transactions(execution_date: str, run_id: str) -> str:
     """
     Zero-Disk Daily Ingestion: Jana data terus ke dalam RAM (BytesIO) 
     dan stream terus ke AWS S3.
