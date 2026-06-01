@@ -9,11 +9,7 @@ import boto3
 
 logger = logging.getLogger(__name__)
 
-def generate_and_stream_historical_transactions(start_date: str, end_date: str, run_id: str) -> None:
-    """
-    Zero-Disk Historical Ingestion: Menjana jutaan data, membuat partition 
-    secara 'groupby' di dalam RAM, dan menembak terus ke S3 secara berperingkat.
-    """
+def historical_transactions(start_date: str, end_date: str, run_id: str) -> None:
     start = datetime.strptime(start_date, '%Y-%m-%d')
     end = datetime.strptime(end_date, '%Y-%m-%d')
     days = (end - start).days + 1
@@ -35,11 +31,7 @@ def generate_and_stream_historical_transactions(start_date: str, end_date: str, 
     s3_client = boto3.client('s3')
     bucket_name = os.getenv("S3_BUCKET_NAME")
 
-    logger.info(f"Memulakan streaming RAM untuk {days} hari data sejarah...")
-
-    # SENIOR TRICK: Groupby dalam RAM untuk buat Hive Partition tanpa menyentuh disk
     for dt, group in df.groupby('dt'):
-        # Buang kolum 'dt' sebelum simpan sebab nama folder dah ada 'dt=' (Standard Hive)
         clean_group = group.drop(columns=['dt'])
         
         buffer = io.BytesIO()
@@ -49,4 +41,4 @@ def generate_and_stream_historical_transactions(start_date: str, end_date: str, 
         s3_key = f"raw/transactions/dt={dt}/run_historical_{run_id}.parquet"
         s3_client.put_object(Bucket=bucket_name, Key=s3_key, Body=buffer.getvalue())
 
-    logger.info("⚡ [RAM Stream] Semua data sejarah berjaya di-stream ke S3!")
+    logger.info("Successfully fetch to S3!")

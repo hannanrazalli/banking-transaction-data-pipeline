@@ -48,7 +48,8 @@ with DAG(
     task_load_daily_forex = PythonOperator(
         task_id='load_daily_forex_to_bq',
         python_callable=sync_forex_to_bq,
-        op_kwargs={'s3_key': 'raw/forex/dt={{ ds }}/run_{{ run_id }}.json'}
+        op_kwargs={'s3_key': 'raw/forex/dt={{ ds }}/run_{{ run_id }}.json'},
+        outlets=[bq_raw_ready]
     )
 
     task_load_daily_tx
