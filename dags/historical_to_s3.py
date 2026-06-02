@@ -19,12 +19,12 @@ END_DATE = 'macros.ds_add(ds, -1)'
 
 with DAG(
     dag_id = 'Historical_to_S3',
-    scehdule = None,
-    start_date = START_DATE,
+    schedule = None,
+    start_date = datetime(2026, 5, 1)
     catchup = False
 ) as dag:
     
-    task_historical_tx = PythonOperator(
+    task_transactions = PythonOperator(
         task_id = 'Historical_transactions_to_S3',
         python_callable = historical_transactions,
         op_kwargs = {
@@ -34,7 +34,7 @@ with DAG(
         }
     )
 
-    task_historical_forex = PythonOperator(
+    task_forex = PythonOperator(
         task_id = 'Historical_Forex_to_S3',
         python_callable = historical_forex,
         op_kwargs = {
@@ -43,3 +43,6 @@ with DAG(
             'run_id' : '{{ run_id }}'
         }
     )
+
+    task_transactions
+    task_forex

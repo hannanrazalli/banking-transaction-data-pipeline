@@ -1,6 +1,5 @@
 import os
 import json
-import time
 import requests
 import logging
 import pandas as pd
@@ -11,6 +10,7 @@ logger = logging.getLogger(__name__)
 def daily_forex(execution_date: str, api_key: str, run_id: str):
     s3_hook = S3Hook(aws_conn_id='aws_default')
     bucket_name = os.getenv("S3_BUCKET_NAME")
+    date_str = dt.strftime('%Y-%m-%d')
     url = f"https://v6.exchangerate-api.com/v6/{api_key}/latest/USD"
 
     try:
@@ -25,8 +25,8 @@ def daily_forex(execution_date: str, api_key: str, run_id: str):
             bucket_name = bucket_name,
             replace = True
         )
-        logger.info(f"Successfully fetch data {execution_date}")
-
+        logger.info(f"Successfully fetched data {execution_date}")
+        
     except Exception as e:
         logger.error(f"Failed to fetch data {execution_date}: {e}")
         raise e
