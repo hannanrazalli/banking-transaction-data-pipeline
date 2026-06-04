@@ -39,7 +39,6 @@ joined_data AS (
         t.amount AS original_amount,
         t.currency AS original_currency,
         
-        -- Carian kadar tukaran MYR
         CASE
             WHEN t.currency = 'MYR' THEN 1.0
             WHEN t.currency = 'USD' THEN f.exchange_rate_myr
@@ -72,7 +71,6 @@ SELECT
     original_currency,
     exchange_rate,
     
-    -- Pengiraan MYR
     ROUND(CAST(original_amount * exchange_rate AS FLOAT64), 2) AS amount_myr,
     
     status,

@@ -14,9 +14,16 @@ from datetime import datetime
 from include.ingestion.generators.daily_transactions import daily_transactions
 from include.ingestion.api.daily_forex_api import daily_forex
 
+default_args = {
+    'owner': 'hannan_razalli',
+    'depends_on_past': False,
+    'retries': 2,
+}
+
 with DAG(
-    dag_id = 'Daily_to_S3',
-    schedule = '0 16 * * *',
+    dag_id = 'DB_to_S3_Daily',
+    default_args=default_args,
+    schedule = '0 0 * * *',
     start_date = datetime(2026, 1, 1),
     catchup = False
 ) as dag:
@@ -26,16 +33,16 @@ with DAG(
         python_callable = daily_transactions,
         op_kwargs = {
             'execution_date' : '{{ ds }}',
-            'run_id' : '{[ run_id ]}'
+            'run_id' : '{{ run_id }}'
         }
     )
 
-    task_transactions = PythonOperator(
+    task_forex = PythonOperator(
         task_id = 'Daily_Forex_to_S3',
         python_callable = daily_forex,
         op_kwargs = {
             'execution_date' : '{{ ds }}',
-            'api_key' : os.getenv("FOREX_API_KEY")
-            'run_id' : '{[ run_id ]}'
+            'api_key' : os.getenv("FOREX_API_KEY"),
+            'run_id' : '{{ run_id }}'
         }
     )

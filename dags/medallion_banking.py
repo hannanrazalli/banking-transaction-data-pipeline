@@ -50,7 +50,7 @@ dbtdag = DbtDag(
     schedule=[bq_raw_ready],
     start_date=datetime(2025, 1, 1),
     catchup=False,
-    dag_id="medallion_banking",
+    dag_id="Medallion_Banking",
     default_args={
         "owner" : "hannan_razalli",
         "retries" : 2

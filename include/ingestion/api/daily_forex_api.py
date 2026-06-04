@@ -10,7 +10,6 @@ logger = logging.getLogger(__name__)
 def daily_forex(execution_date: str, api_key: str, run_id: str):
     s3_hook = S3Hook(aws_conn_id='aws_default')
     bucket_name = os.getenv("S3_BUCKET_NAME")
-    date_str = dt.strftime('%Y-%m-%d')
     url = f"https://v6.exchangerate-api.com/v6/{api_key}/latest/USD"
 
     try:

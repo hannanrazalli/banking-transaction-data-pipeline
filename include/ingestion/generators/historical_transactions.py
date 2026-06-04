@@ -1,44 +1,59 @@
-import io
-import uuid
 import os
+import time
 import logging
-from datetime import datetime, timedelta
-import numpy as np
 import pandas as pd
-import boto3
+from airflow.providers.postgres.hooks.postgres import PostgresHook
+from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 
 logger = logging.getLogger(__name__)
 
 def historical_transactions(start_date: str, end_date: str, run_id: str) -> None:
-    start = datetime.strptime(start_date, '%Y-%m-%d')
-    end = datetime.strptime(end_date, '%Y-%m-%d')
-    days = (end - start).days + 1
-    num_records = days * 1000
-
-    random_days = np.random.randint(0, days, num_records)
-    df = pd.DataFrame({
-        "transaction_id": [str(uuid.uuid4()) for _ in range(num_records)],
-        "account_id": np.random.randint(10000, 99999, num_records).astype(np.int32),
-        "amount": np.round(np.random.uniform(10.0, 5000.0, num_records), 2).astype(np.float32),
-        "currency": np.random.choice(["MYR", "USD", "SGD", "EUR"], num_records),
-        "transaction_date": [start + timedelta(days=int(d)) for d in random_days],
-        "status": np.random.choice(["COMPLETED", "FAILED"], num_records, p=[0.9, 0.1])
-    })
-
-    df["dt"] = df["transaction_date"].dt.strftime('%Y-%m-%d')
-    df["transaction_date"] = df["transaction_date"].dt.strftime('%Y-%m-%d %H:%M:%S')
-
-    s3_client = boto3.client('s3')
+    pg_hook = PostgresHook(postgres_conn_id='postgres_default')
+    s3_hook = S3Hook(aws_conn_id='aws_default')
     bucket_name = os.getenv("S3_BUCKET_NAME")
+    
+    dates = pd.date_range(start=start_date, end=end_date)
 
-    for dt, group in df.groupby('dt'):
-        clean_group = group.drop(columns=['dt'])
+    for dt in dates:
+        date_str = dt.strftime('%Y-%m-%d')
         
-        buffer = io.BytesIO()
-        clean_group.to_parquet(buffer, index=False, compression='snappy')
-        buffer.seek(0)
+        try:
+            query_acc = f"""
+                SELECT account_id, customer_name, account_status, account_tier, credit_limit, updated_at 
+                FROM accounts 
+                WHERE updated_at::date = '{date_str}'::date
+            """
+            df_acc = pg_hook.get_pandas_df(sql=query_acc)
+            
+            if not df_acc.empty:
+                s3_key_acc = f"raw/accounts/dt={date_str}/run_historical_{run_id}.parquet"
+                s3_hook.load_bytes(
+                    bytes_data = df_acc.to_parquet(index=False, compression='snappy'),
+                    key = s3_key_acc,
+                    bucket_name = bucket_name,
+                    replace = True
+                )
 
-        s3_key = f"raw/transactions/dt={dt}/run_historical_{run_id}.parquet"
-        s3_client.put_object(Bucket=bucket_name, Key=s3_key, Body=buffer.getvalue())
+            query_txn = f"""
+                SELECT transaction_id, account_id, amount, currency, transaction_type, transaction_date 
+                FROM transactions 
+                WHERE transaction_date::date = '{date_str}'::date
+            """
+            df_txn = pg_hook.get_pandas_df(sql=query_txn)
+            
+            if not df_txn.empty:
+                s3_key_txn = f"raw/transactions/dt={date_str}/run_historical_{run_id}.parquet"
+                s3_hook.load_bytes(
+                    bytes_data = df_txn.to_parquet(index=False, compression='snappy'),
+                    key = s3_key_txn,
+                    bucket_name = bucket_name,
+                    replace = True
+                )
 
-    logger.info("Successfully fetch to S3!")
+            logger.info(f"Successfully ingested historical data from Postgres to S3 for {date_str}")
+
+        except Exception as e:
+            logger.error(f"Failed to ingest historical data for {date_str}: {e}")
+            raise e
+        
+        time.sleep(1)

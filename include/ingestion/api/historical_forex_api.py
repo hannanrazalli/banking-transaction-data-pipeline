@@ -29,8 +29,8 @@ def historical_forex(start_date: str, end_date: str, run_id: str):
                 bucket_name = bucket_name,
                 replace = True
             )
-            logger.info(f"Successfully fetched data {date_str}")
-            
+            logger.info(f"Successfully fetch data {date_str}")
+
         except Exception as e:
             logger.error(f"Failed to fetch data {date_str}: {e}")
             raise e

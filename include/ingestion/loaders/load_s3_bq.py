@@ -20,7 +20,7 @@ def load_transactions(s3_key: str) -> None:
 
     client = bq_hook.get_client()
     table_id = "banking_raw.raw_transactions"
-    job_config = bigquery.LoadJobConfig(write_disposition="WRITE_APPEND")
+    job_config = bigquery.LoadJobConfig(write_disposition = "WRITE_APPEND")
 
     job = client.load_table_from_dataframe(df, table_id, job_config=job_config)
     job.result()
@@ -42,7 +42,7 @@ def load_forex(s3_key: str) -> None:
     client = bq_hook.get_client()
     table_id = "banking_raw.raw_forex"
     job_config = bigquery.LoadJobConfig(
-        write_disposition="WRITE_APPEND",
+        write_disposition = "WRITE_APPEND",
         schema = [
             bigquery.SchemaField("forex_data", "STRING"),
             bigquery.SchemaField("_ingest_at", "TIMESTAMP")
