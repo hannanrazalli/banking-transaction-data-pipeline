@@ -25,6 +25,25 @@ def load_transactions(s3_key: str) -> None:
     job = client.load_table_from_dataframe(df, table_id, job_config=job_config)
     job.result()
 
+def load_accounts(s3_key: str) -> None:
+    s3_hook = S3Hook(aws_conn_id='aws_default')
+    bq_hook = BigQueryHook(gcp_conn_id='gcp_default')
+    bucket_name = os.getenv("S3_BUCKET_NAME")
+    parquet_bytes = s3_hook.get_key(
+        key = s3_key,
+        bucket_name = bucket_name
+    )
+
+    df = pd.read_parquet(io.BytesIO(parquet_bytes.get()['Body'].read()))
+    df['_ingest_at'] = pd.Timestamp.now(tz='UTC')
+
+    client = bq_hook.get_client()
+    table_id = "banking_raw.raw_accounts"
+    job_config = bigquery.LoadJobConfig(write_disposition = "WRITE_APPEND")
+
+    job = client.load_table_from_dataframe(df, table_id, job_config=job_config)
+    job.result()
+
 def load_forex(s3_key: str) -> None:
     s3_hook = S3Hook(aws_conn_id='aws_default')
     bq_hook = BigQueryHook(gcp_conn_id='gcp_default')

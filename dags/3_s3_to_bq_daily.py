@@ -17,7 +17,7 @@ from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.operators.python import PythonOperator
 from airflow.datasets import Dataset
 
-from include.ingestion.loaders.load_s3_bq import load_transactions, load_forex
+from include.ingestion.loaders.load_s3_bq import load_transactions, load_accounts, load_forex
 
 bq_raw_ready = Dataset("bigquery://banking_raw/data_ready")
 
@@ -40,6 +40,20 @@ def daily_tx_to_bq(ds, **kwargs):
         for key in keys:
             if key.endswith('.parquet'):
                 load_transactions(s3_key=key)
+
+def daily_acc_to_bq(ds, **kwargs):
+    s3_hook = S3Hook(aws_conn_id='aws_default')
+    bucket_name = os.getenv("S3_BUCKET_NAME")
+    
+    keys = s3_hook.list_keys(
+        bucket_name = bucket_name,
+        prefix = f"raw/accounts/dt={ds}/"
+    )
+
+    if keys:
+        for key in keys:
+            if key.endswith('.parquet'):
+                load_accounts(s3_key=key)
 
 def daily_fx_to_bq(ds, **kwargs):
     s3_hook = S3Hook(aws_conn_id='aws_default')
@@ -69,6 +83,12 @@ with DAG(
         outlets = [bq_raw_ready]
     )
 
+    task_acc_daily = PythonOperator(
+        task_id = 'load_daily_accounts_to_bq',
+        python_callable = daily_acc_to_bq,
+        outlets = [bq_raw_ready]
+    )
+
     task_fx_daily = PythonOperator(
         task_id = 'load_daily_forex_to_bq',
         python_callable = daily_fx_to_bq,
@@ -76,4 +96,5 @@ with DAG(
     )
 
     task_tx_daily
+    task_acc_daily
     task_fx_daily

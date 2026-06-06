@@ -6,7 +6,7 @@ from datetime import datetime
 from airflow import DAG
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.operators.python import PythonOperator
-from include.ingestion.loaders.load_s3_bq import load_transactions, load_forex
+from include.ingestion.loaders.load_s3_bq import load_transactions, load_accounts, load_forex
 
 default_args = {
     'owner': 'hannan_razalli',
@@ -26,6 +26,19 @@ def historical_tx_to_bq():
         for key in keys:
             if key.endswith('.parquet'):
                 load_transactions(s3_key=key)
+
+def historical_acc_to_bq():
+    s3_hook = S3Hook(aws_conn_id='aws_default')
+    bucket_name = os.getenv("S3_BUCKET_NAME")
+    keys = s3_hook.list_keys(
+        bucket_name = bucket_name,
+        prefix = 'raw/accounts/'
+    )
+
+    if keys:
+        for key in keys:
+            if key.endswith('.parquet'):
+                load_accounts(s3_key=key)
 
 def historical_fx_to_bq():
     s3_hook = S3Hook(aws_conn_id='aws_default')
@@ -53,10 +66,16 @@ with DAG(
         python_callable = historical_tx_to_bq
     )
 
+    task_hist_accounts = PythonOperator(
+        task_id = 'Historical_Accounts_to_BQ',
+        python_callable = historical_acc_to_bq
+    )
+
     task_hist_forex = PythonOperator(
         task_id = 'Historical_Forex_to_BQ',
         python_callable = historical_fx_to_bq
     )
 
     task_hist_transactions
+    task_hist_accounts
     task_hist_forex
