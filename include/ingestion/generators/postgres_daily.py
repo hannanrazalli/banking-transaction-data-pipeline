@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 def daily_to_postgres(execution_date: str) -> None:
     pg_hook = PostgresHook(postgres_conn_id='postgres_default')
     
-    account_pool = [f"ACC_{1000 + i}" for i in range(100)]
+    account_pool = [f"ACC_{1000 + i}" for i in range(1000)]
     status_pool = ["ACTIVE", "SUSPENDED", "DORMANT", "VIP"]
     tier_pool = ["BRONZE", "SILVER", "GOLD", "PLATINUM"]
     
@@ -43,7 +43,9 @@ def daily_to_postgres(execution_date: str) -> None:
         pg_hook.insert_rows(
             table="accounts",
             rows=df_acc.where(pd.notnull(df_acc), None).values.tolist(),
-            target_fields=df_acc.columns.tolist()
+            target_fields=df_acc.columns.tolist(),
+            replace=True,
+            replace_index="account_id"
         )
         
         pg_hook.insert_rows(

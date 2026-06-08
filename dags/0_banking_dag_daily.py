@@ -4,10 +4,10 @@ from datetime import datetime
 from include.ingestion.generators.postgres_daily import daily_to_postgres
 
 with DAG(
-    dag_id='Postgres_Generator_Daily',
+    dag_id='1_Postgres_Daily_Gen',
     schedule_interval='@daily',
-    start_date=datetime(2026, 6, 1),
-    catchup=True
+    start_date=datetime(2026, 6, 5),
+    catchup=False
 ) as dag:
 
     run_daily_generator = PythonOperator(

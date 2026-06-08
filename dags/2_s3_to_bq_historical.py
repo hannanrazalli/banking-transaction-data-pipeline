@@ -54,7 +54,7 @@ def historical_fx_to_bq():
                 load_forex(s3_key=key)
 
 with DAG(
-    dag_id = 'S3_to_BQ_Historical',
+    dag_id = '3_S3_to_BQ_Historical',
     default_args=default_args,
     schedule = None,
     start_date = datetime(2026, 5, 1),
