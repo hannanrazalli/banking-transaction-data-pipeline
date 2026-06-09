@@ -1,9 +1,9 @@
 {{ config(
-    materialized='table'
+    materialized='incremental'
 ) }}
 
 WITH silver_forex AS (
-    SELECT * FROM {{ ref('int_forex') }}
+    SELECT * FROM {{ ref('int_forex_refined') }}
 ),
 
 generate_surrogate_key AS (

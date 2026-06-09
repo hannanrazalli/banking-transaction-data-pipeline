@@ -20,16 +20,16 @@ AWS_CONN = os.getenv("AWS_CONN_ID", "aws_default")
 BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
 
 def daily_banking(execution_date, **kwargs):
-    pg_hook = PostgresHook(posgres_conn_id=POSTRGES_CONN)
+    pg_hook = PostgresHook(postgres_conn_id=POSTGRES_CONN)
     s3_hook = S3Hook(aws_conn_id=AWS_CONN)
 
-    tables = ["accoutns", "transactions"]
+    tables = ["accounts", "transactions"]
 
     for table in tables:
         if table == 'accounts':
-            query = f"SELECT * FROM accounts WHERE DATE(updated_at) = {execution_date}"
+            query = f"SELECT * FROM accounts WHERE DATE(updated_at) = '{execution_date}'"
         else:
-            query = f"SELECT * FROM transactions WHERE DATE(transactions_date) = {execution_date}"
+            query = f"SELECT * FROM transactions WHERE DATE(transaction_date) = '{execution_date}'"
 
         df = pg_hook.get_pandas_df(query)
 

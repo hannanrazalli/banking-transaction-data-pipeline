@@ -14,8 +14,8 @@ WITH clean_transactions AS (
     WHERE _record_status = 'CLEAN'
     
     {% if is_incremental() %}
-        AND _ingest_at >= (
-            SELECT TIMESTAMP_SUB(MAX(tx_ingest_at), INTERVAL 1 DAY) 
+        AND _ingest_at > (
+            SELECT COALESCE(TIMESTAMP_SUB(MAX(tx_ingest_at), INTERVAL 1 HOUR), '1900-01-01') 
             FROM {{ this }}
         )
     {% endif %}
@@ -28,7 +28,7 @@ deduped_transactions AS (
 ),
 
 clean_forex AS (
-    SELECT * FROM {{ ref('int_forex') }}
+    SELECT * FROM {{ ref('int_forex_refined') }}
 ),
 
 joined_data AS (
@@ -40,20 +40,20 @@ joined_data AS (
         t.currency AS original_currency,
         
         CASE
-            WHEN t.currency = 'MYR' THEN 1.0
-            WHEN t.currency = 'USD' THEN f.exchange_rate_myr
-            WHEN t.currency = 'SGD' THEN f.exchange_rate_sgd
-            WHEN t.currency = 'EUR' THEN f.exchange_rate_eur
-            WHEN t.currency = 'GBP' THEN f.exchange_rate_gbp
+            WHEN t.currency = 'USD' THEN 1.0
+            WHEN t.currency = 'MYR' THEN (1.0 / f.exchange_rate_myr)
+            WHEN t.currency = 'SGD' THEN (1.0 / f.exchange_rate_sgd)
+            WHEN t.currency = 'EUR' THEN (1.0 / f.exchange_rate_eur)
+            WHEN t.currency = 'GBP' THEN (1.0 / f.exchange_rate_gbp)
             ELSE NULL
-        END AS exchange_rate,
+        END AS exchange_rate_to_usd,
         
-        t.status,
+        t.transaction_type,
         
         CASE 
-            WHEN t.status = 'CANCELLED' THEN TRUE
+            WHEN t.transaction_type IN ('WITHDRAWAL', 'PAYMENT', 'TRANSFER') THEN TRUE
             ELSE FALSE
-        END AS _is_deleted,
+        END AS _is_outbound_funds,
 
         t._ingest_at AS tx_ingest_at,
         f._ingest_at AS forex_ingest_at
@@ -69,12 +69,12 @@ SELECT
     transaction_date,
     original_amount,
     original_currency,
-    exchange_rate,
+    exchange_rate_to_usd,
     
-    ROUND(CAST(original_amount * exchange_rate AS FLOAT64), 2) AS amount_myr,
+    ROUND(CAST(original_amount * exchange_rate_to_usd AS FLOAT64), 2) AS amount_usd,
     
-    status,
-    _is_deleted,
+    transaction_type,
+    _is_outbound_funds,
     tx_ingest_at,
     forex_ingest_at,
     

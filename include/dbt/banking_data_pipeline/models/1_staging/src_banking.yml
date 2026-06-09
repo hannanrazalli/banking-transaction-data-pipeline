@@ -6,3 +6,4 @@ sources:
     tables:
       - name: raw_transactions
       - name: raw_forex
+      - name: raw_accounts

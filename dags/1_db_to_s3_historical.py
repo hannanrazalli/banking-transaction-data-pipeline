@@ -16,22 +16,22 @@ default_args = {
 }
 
 START_DATE = '2026-5-1'
-END_DATE = '2026-6-6'
-POSTRGES_CONN = os.getenv("POSTGRES_CONN_ID", "postgres_default")
+END_DATE = '2026-6-7'
+POSTGRES_CONN = os.getenv("POSTGRES_CONN_ID", "postgres_default")
 AWS_CONN = os.getenv("AWS_CONN_ID", "aws_default")
 BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
 
 def historical_banking(date_str, **kwargs):
-    pg_hook = PostgresHook(posgres_conn_id=POSTRGES_CONN)
+    pg_hook = PostgresHook(postgres_conn_id=POSTGRES_CONN)
     s3_hook = S3Hook(aws_conn_id=AWS_CONN)
 
-    tables = ["accoutns", "transactions"]
+    tables = ["accounts", "transactions"]
 
     for table in tables:
         if table == 'accounts':
-            query = f"SELECT * FROM accounts WHERE DATE(updated_at) = {date_str}"
+            query = f"SELECT * FROM accounts WHERE DATE(updated_at) = '{date_str}'"
         else:
-            query = f"SELECT * FROM transactions WHERE DATE(transactions_date) = {date_str}"
+            query = f"SELECT * FROM transactions WHERE DATE(transaction_date) = '{date_str}'"
 
         df = pg_hook.get_pandas_df(query)
 
