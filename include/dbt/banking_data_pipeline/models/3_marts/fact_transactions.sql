@@ -1,7 +1,7 @@
 {{ config(
     materialized='incremental',
     unique_key='transaction_id',
-    on_schema_change='append_new_columns',
+    incremental_strategy='merge',
     partition_by={
       "field": "transaction_date",
       "data_type": "timestamp",
@@ -9,38 +9,31 @@
     }
 ) }}
 
-WITH silver_transactions AS (
-    SELECT * FROM {{ ref('int_transactions') }}
-    WHERE _is_deleted = FALSE 
-    
+WITH silver_tx AS (
+    SELECT * FROM {{ ref('int_transactions_refined') }}
     {% if is_incremental() %}
-        AND tx_ingest_at >= (
-            SELECT TIMESTAMP_SUB(MAX(tx_ingest_at), INTERVAL 1 DAY) 
-            FROM {{ this }}
-        )
+        WHERE _refined_at > (SELECT MAX(_refined_at) FROM {{ this }})
     {% endif %}
 ),
 
 final_fact AS (
     SELECT
         transaction_id,
-        account_id,
-        transaction_date,
+        {{ dbt_utils.generate_surrogate_key(['account_id']) }} AS account_sk,
         
-        {{ dbt_utils.generate_surrogate_key(['DATE(transaction_date)', 'original_currency']) }} AS forex_sk,
+        transaction_date,
+        transaction_type,
         
         original_amount,
         original_currency,
-        exchange_rate,
-        amount_myr,
+        exchange_rate_to_usd,
         
-        status,
-        tx_ingest_at,
+        ROUND(CAST(original_amount * exchange_rate_to_usd AS FLOAT64), 2) AS amount_usd,
         
-        CURRENT_TIMESTAMP() AS _marts_at,
-        '{{ invocation_id }}' AS _batch_id_gold
-
-    FROM silver_transactions
+        _refined_at,
+        {{ audit_columns('gold') }}
+        
+    FROM silver_tx
 )
 
 SELECT * FROM final_fact

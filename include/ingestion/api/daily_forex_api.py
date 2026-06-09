@@ -1,32 +1,31 @@
-import io
-import json
 import os
+import json
 import requests
 import logging
-import boto3
+import pandas as pd
+from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 
 logger = logging.getLogger(__name__)
 
-def fetch_and_stream_daily_forex(execution_date: str, api_key: str, run_id: str) -> None:
-    """
-    Tarik data API terus masuk RAM dan simpan ke S3 sebagai fail JSON.
-    """
+def daily_forex(execution_date: str, api_key: str, run_id: str):
+    s3_hook = S3Hook(aws_conn_id='aws_default')
+    bucket_name = os.getenv("S3_BUCKET_NAME")
     url = f"https://v6.exchangerate-api.com/v6/{api_key}/latest/USD"
-    
-    response = requests.get(url, timeout=10)
-    response.raise_for_status()
-    data = response.json()
-    data['ingestion_date'] = execution_date
 
-    # Tukar JSON dict ke format string bytes di dalam RAM
-    json_bytes = json.dumps(data).encode('utf-8')
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
 
-    s3_client = boto3.client('s3')
-    s3_key = f"raw/forex/dt={execution_date}/run_{run_id}.json"
-    
-    s3_client.put_object(
-        Bucket=os.getenv("S3_BUCKET_NAME"),
-        Key=s3_key,
-        Body=json_bytes
-    )
-    logger.info(f"⚡ [RAM Stream] Forex harian berjaya di-stream ke S3.")
+        s3_key = f"raw/forex/dt={execution_date}/run_{run_id}.json"
+        s3_hook.load_string(
+            string_data = json.dumps(data),
+            key = s3_key,
+            bucket_name = bucket_name,
+            replace = True
+        )
+        logger.info(f"Successfully fetched data {execution_date}")
+        
+    except Exception as e:
+        logger.error(f"Failed to fetch data {execution_date}: {e}")
+        raise e

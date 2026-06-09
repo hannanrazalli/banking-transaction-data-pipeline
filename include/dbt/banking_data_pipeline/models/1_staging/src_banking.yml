@@ -2,7 +2,8 @@ version: 2
 
 sources:
   - name: banking_raw
-    schema: banking_raw # Nama dataset di BigQuery
+    schema: banking_raw # Dataset BigQuery
     tables:
       - name: raw_transactions
       - name: raw_forex
+      - name: raw_accounts
