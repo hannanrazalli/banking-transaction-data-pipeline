@@ -55,7 +55,7 @@ Avoided BigQuery External Tables for transactional data. Instead, Python's `BigQ
 
 ```
 
-🚀 Local Development Guide
+## 🚀 Local Development Guide
 (Note: Executing this pipeline requires active AWS and GCP Service Account credentials.)
 
 **1. Clone the repository:**
