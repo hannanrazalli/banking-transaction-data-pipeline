@@ -35,11 +35,13 @@ Avoided BigQuery External Tables for transactional data. Instead, Python's `BigQ
 ```text
 .
 ├── dags/
-│   ├── historical_to_s3.py                 # One-off backfill DAG
-│   ├── historical_s3_to_bq.py              # One-off backfill DAG
-│   ├── daily_to_s3.py                      # Daily incremental extraction to S3
-│   ├── s3_to_bq.py                         # Ingestion from S3 to BigQuery (Emits Airflow Dataset)
-│   └── medallion_banking.py                # Astronomer Cosmos DAG for dbt models
+│   ├── 0_banking_dag_historical.py         # Orchestrates historical mock data generation
+│   ├── 0_banking_dag_daily.py              # Orchestrates daily mock data generation
+│   ├── 1_db_to_s3_historical.py            # Extracts historical data to AWS S3
+│   ├── 1_db_to_s3_daily.py                 # Extracts daily incremental data to AWS S3
+│   ├── 2_s3_to_bq_historical.py            # Ingests historical data from S3 to BigQuery Native Tables
+│   ├── 2_s3_to_bq_daily.py                 # Ingests daily data from S3 to BigQuery (Emits Airflow Dataset)
+│   └── 3_medallion_banking.py              # Astronomer Cosmos DAG for dbt models (Data-Aware scheduling)
 ├── include/
 │   ├── ingestion/                          # Custom Python loaders and extractors
 │   └── dbt/banking_data_pipeline/
