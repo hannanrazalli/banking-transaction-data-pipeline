@@ -53,6 +53,8 @@ Avoided BigQuery External Tables for transactional data. Instead, Python's `BigQ
 ├── requirements.txt                        # Python dependencies
 └── Dockerfile                              # Astro Runtime custom image
 
+```
+
 🚀 Local Development Guide
 (Note: Executing this pipeline requires active AWS and GCP Service Account credentials.)
 
