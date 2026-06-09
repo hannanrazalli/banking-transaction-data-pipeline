@@ -84,9 +84,9 @@ Navigate to http://localhost:8080 (Default credentials: admin/admin).
 ### 1. dbt Medallion Architecture Lineage Graph
 This graph illustrates the modular dependency and data flow from raw staging tables to downstream analytical marts inside Google BigQuery:
 
-![dbt Medallion Lineage Graph](images/medallion_graph.png)
+![dbt Medallion Lineage Graph](images/Medallion.png)
 
 ### 2. Orchestration DAGs (Successful Runs)
 Proof of execution for all historical and daily pipeline DAGs running successfully within the local Astro Runtime environment:
 
-![Airflow DAG Success Run](images/airflow.png)
+![Airflow DAG Success Run](images/Airflow_DAG.png)
