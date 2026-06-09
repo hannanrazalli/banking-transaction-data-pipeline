@@ -52,7 +52,7 @@ dbtdag = DbtDag(
     catchup=False,
     dag_id="4_Medallion_Banking",
     default_args={
-        "owner" : "hannan_razalli",
+        "owner" : "Hannan_Razalli",
         "retries" : 2
     }
 )

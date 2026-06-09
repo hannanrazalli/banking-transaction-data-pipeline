@@ -5,6 +5,8 @@ This project is an end-to-end data engineering pipeline designed to process dail
 
 ## 🏗️ Architecture & Tech Stack
 
+![Architecture & Tech Stack](images/Architecture.png)
+
 * **Source System (OLTP):** PostgreSQL (Local / Containerized)
 * **Orchestration:** Apache Airflow (Astronomer Cosmos)
 * **Data Warehouse:** Google BigQuery (Native Tables)

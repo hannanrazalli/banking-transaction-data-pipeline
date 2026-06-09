@@ -13,7 +13,7 @@ def load_transactions(s3_key: str) -> None:
 
     parquet_bytes = s3_hook.get_key(
         key = s3_key,
-        bucket_name = os.getenv("S3_BUCKET_NAME")
+        bucket_name = bucket_name
     )
 
     df = pd.read_parquet(io.BytesIO(parquet_bytes.get()['Body'].read()))
@@ -33,7 +33,7 @@ def load_accounts(s3_key: str) -> None:
 
     parquet_bytes = s3_hook.get_key(
         key = s3_key,
-        bucket_name = os.getenv("S3_BUCKET_NAME")
+        bucket_name = bucket_name
     )
 
     df = pd.read_parquet(io.BytesIO(parquet_bytes.get()['Body'].read()))
@@ -53,7 +53,7 @@ def load_forex(s3_key: str) -> None:
 
     json_string = s3_hook.read_key(
         key = s3_key,
-        bucket_name = os.getenv("S3_BUCKET_NAME")
+        bucket_name = bucket_name
     )
 
     df = pd.DataFrame([{
