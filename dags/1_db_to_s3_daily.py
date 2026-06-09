@@ -15,7 +15,7 @@ default_args = {
     'retries' : 2
 }
 
-POSTRGES_CONN = os.getenv("POSTGRES_CONN_ID", "postgres_default")
+POSTGRES_CONN = os.getenv("POSTGRES_CONN_ID", "postgres_default")
 AWS_CONN = os.getenv("AWS_CONN_ID", "aws_default")
 BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
 

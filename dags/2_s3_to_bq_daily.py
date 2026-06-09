@@ -22,7 +22,7 @@ from include.ingestion.loaders.load_s3_bq import load_transactions, load_account
 bq_raw_ready = Dataset("bigquery://banking_raw/data_ready")
 
 default_args = {
-    'owner': 'hannan_razalli',
+    'owner': 'Hannan_Razalli',
     'depends_on_past': False,
     'retries': 2,
 }

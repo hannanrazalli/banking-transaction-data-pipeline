@@ -3,8 +3,15 @@ from airflow.operators.python import PythonOperator
 from datetime import datetime
 from include.ingestion.generators.postgres_daily import daily_to_postgres
 
+default_args = {
+    'owner': 'Hannan_Razalli',
+    'depends_on_past': False,
+    'retries': 2,
+}
+
 with DAG(
     dag_id='1_Postgres_Daily_Gen',
+    default_args = default_args,
     schedule_interval='@daily',
     start_date=datetime(2026, 6, 5),
     catchup=False
