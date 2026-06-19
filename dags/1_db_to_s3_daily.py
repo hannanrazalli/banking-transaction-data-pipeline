@@ -55,7 +55,7 @@ with DAG(
 ) as dag:
     
     task_fx_to_s3 = PythonOperator(
-        task_id = 'FX_to_S3_Historical',
+        task_id = 'FX_to_S3_Daily',
         python_callable = daily_forex,
         op_kwargs = {
             'execution_date' : '{{ ds }}',

@@ -22,7 +22,7 @@ with DAG(
         python_callable=historical_to_postgres,
         op_kwargs={
             'start_date': '2026-05-01',
-            'end_date': '2026-06-05'
+            'end_date': '2026-06-09'
         }
     )
 

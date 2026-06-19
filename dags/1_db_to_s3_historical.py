@@ -16,7 +16,7 @@ default_args = {
 }
 
 START_DATE = '2026-5-1'
-END_DATE = '2026-6-7'
+END_DATE = '2026-6-9'
 POSTGRES_CONN = os.getenv("POSTGRES_CONN_ID", "postgres_default")
 AWS_CONN = os.getenv("AWS_CONN_ID", "aws_default")
 BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
