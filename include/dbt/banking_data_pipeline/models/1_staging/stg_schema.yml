@@ -1,0 +1,66 @@
+version: 2
+
+models:
+  - name: stg_transactions
+    description: Cleaned and typed raw transactions
+    columns:
+      - name: transaction_id
+        tests:
+          - not_null
+      - name: account_id
+        tests:
+          - not_null
+      - name: amount
+        tests:
+          - not_null
+      - name: currency
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["MYR", "USD", "SGD", "EUR", "GBP"]
+      - name: transaction_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["DEPOSIT", "WITHDRAWAL", "TRANSFER", "PAYMENT"]
+      - name: _record_status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["CLEAN", "CORRUPT"]
+
+  - name: stg_accounts
+    description: Cleaned and typed raw accounts
+    columns:
+      - name: account_id
+        tests:
+          - not_null
+          - unique
+      - name: account_status
+        tests:
+          - accepted_values:
+              values: ["ACTIVE", "SUSPENDED", "DORMANT", "VIP"]
+      - name: account_tier
+        tests:
+          - accepted_values:
+              values: ["BRONZE", "SILVER", "GOLD", "PLATINUM"]
+      - name: _record_status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["CLEAN", "CORRUPT"]
+
+  - name: stg_forex
+    description: Parsed forex rates from raw JSON
+    columns:
+      - name: forex_date
+        tests:
+          - not_null
+      - name: base_currency
+        tests:
+          - not_null
+      - name: _record_status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["CLEAN", "CORRUPT"]

@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  pull_request:
+    paths:
+      - "include/dbt/**"
+      - ".github/workflows/ci.yml"
+
+jobs:
+  dbt-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dbt
+        run: pip install dbt-bigquery
+
+      - name: Create mock dbt profile
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << 'EOF'
+          banking_data_pipeline:
+            outputs:
+              ci:
+                type: bigquery
+                method: service-account
+                project: mock-project
+                dataset: mock_dataset
+                location: US
+                keyfile: /dev/null
+                threads: 1
+            target: ci
+          EOF
+
+      - name: dbt deps
+        working-directory: include/dbt/banking_data_pipeline
+        run: dbt deps
+
+      - name: dbt parse
+        working-directory: include/dbt/banking_data_pipeline
+        run: dbt parse

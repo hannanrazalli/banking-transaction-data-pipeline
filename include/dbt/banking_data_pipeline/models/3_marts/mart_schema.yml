@@ -1,0 +1,65 @@
+version: 2
+
+models:
+  - name: dim_accounts
+    description: SCD Type 2 dimension for bank accounts
+    columns:
+      - name: account_sk
+        tests:
+          - not_null
+          - unique
+      - name: account_id
+        tests:
+          - not_null
+      - name: is_current
+        tests:
+          - not_null
+      - name: account_status
+        tests:
+          - accepted_values:
+              values: ["ACTIVE", "SUSPENDED", "DORMANT", "VIP"]
+      - name: account_tier
+        tests:
+          - accepted_values:
+              values: ["BRONZE", "SILVER", "GOLD", "PLATINUM"]
+
+  - name: dim_forex
+    description: Forex rate dimension
+    columns:
+      - name: forex_sk
+        tests:
+          - not_null
+          - unique
+      - name: forex_date
+        tests:
+          - not_null
+
+  - name: fact_transactions
+    description: Transaction fact table
+    columns:
+      - name: transaction_id
+        tests:
+          - not_null
+          - unique
+      - name: account_sk
+        tests:
+          - not_null
+      - name: amount_usd
+        tests:
+          - not_null
+      - name: transaction_type
+        tests:
+          - not_null
+
+  - name: mart_monthly_summary
+    description: Monthly aggregated transaction summary by currency
+    columns:
+      - name: transaction_month
+        tests:
+          - not_null
+      - name: original_currency
+        tests:
+          - not_null
+      - name: total_transactions
+        tests:
+          - not_null
