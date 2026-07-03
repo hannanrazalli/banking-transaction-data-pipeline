@@ -8,3 +8,18 @@
 {"data":{},"info":{"category":"","code":"","extra":{},"invocation_id":"019e860a-5a9e-7a41-af97-ea66487ee472","level":"debug","msg":"No active cloud project configured, skipping remote license","name":"Generic","pid":97600,"thread":"tokio-rt-worker","ts":"2026-06-02T01:54:46.053195Z"}}
 {"data":{"columns":[],"is_inline":true,"node_name":"license_info","output_format":"json","preview":"{\n  \"status\": \"not_found\",\n  \"licensing_enabled\": true\n}","unique_id":"license.info"},"info":{"category":"","code":"Q041","extra":{},"invocation_id":"019e860a-5a9e-7a41-af97-ea66487ee472","level":"info","msg":"{\n  \"status\": \"not_found\",\n  \"licensing_enabled\": true\n}","name":"ShowNode","pid":97600,"thread":"tokio-rt-worker","ts":"2026-06-02T01:54:46.053625Z"}}
 {"data":{"completed_at":"2026-06-02T01:54:46.744065Z","elapsed":0.6948010325431824,"success":true},"info":{"category":"","code":"Q039","extra":{},"invocation_id":"019e860a-5a9e-7a41-af97-ea66487ee472","level":"info","msg":"\n==================== Execution Summary =====================\nFinished 'license' successfully [694ms]","name":"CommandCompleted","pid":97600,"thread":"tokio-rt-worker","ts":"2026-06-02T01:54:46.744208Z"}}
+[0m12:32:13.856100 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001FEC74FF6B0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001FEC91B2A20>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001FEC9252E10>]}
+
+
+============================== 12:32:13.863461 | 68c03a94-6206-4f8d-bf91-99770729655f ==============================
+[0m12:32:13.863461 [info ] [MainThread]: Running with dbt=1.12.0-b1
+[0m12:32:13.864461 [debug] [MainThread]: running dbt with arguments {'static_parser': 'True', 'no_print': 'None', 'version_check': 'True', 'target_path': 'None', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'printer_width': '80', 'write_json': 'True', 'empty': 'None', 'log_cache_events': 'False', 'introspect': 'True', 'cache_selected_only': 'False', 'fail_fast': 'False', 'debug': 'False', 'log_format': 'default', 'profiles_dir': 'C:\\Users\\HP\\.dbt', 'send_anonymous_usage_stats': 'True', 'quiet': 'False', 'warn_error': 'None', 'partial_parse': 'True', 'use_colors': 'True', 'invocation_command': 'dbt docs generate', 'indirect_selection': 'eager', 'use_experimental_parser': 'False', 'log_path': 'logs'}
+[0m12:32:13.864461 [error] [MainThread]: [[31mERROR[0m]: Encountered an error:
+Runtime Error
+  No dbt_project.yml found at expected path C:\Users\HP\Documents\GitHub\banking-transaction-data-pipeline\dbt_project.yml
+  Verify that each entry within packages.yml (and their transitive dependencies) contains a file named dbt_project.yml
+  
+[0m12:32:13.865464 [debug] [MainThread]: Command `dbt docs generate` failed at 12:32:13.865464 after 0.18 seconds
+[0m12:32:13.865464 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001FEC9567A40>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001FEC9688500>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001FEC9688380>]}
+[0m12:32:13.865464 [debug] [MainThread]: Flushing usage events
+[0m12:32:15.337182 [debug] [MainThread]: An error was encountered while trying to flush usage events
