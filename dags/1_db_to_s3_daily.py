@@ -47,11 +47,12 @@ def daily_banking(execution_date, **kwargs):
             )
 
 with DAG(
-    dag_id = '2_DB_to_S3_Daily',
+    dag_id = 'db_to_s3_daily',
     default_args = default_args,
     schedule = '@daily',
     start_date = datetime(2026, 5, 1),
-    catchup = False
+    catchup = False,
+    tags=['extract', 's3', 'daily']
 ) as dag:
     
     task_fx_to_s3 = PythonOperator(

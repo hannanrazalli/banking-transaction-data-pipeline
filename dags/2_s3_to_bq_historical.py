@@ -6,7 +6,7 @@ from datetime import datetime
 from airflow import DAG
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.operators.python import PythonOperator
-from include.ingestion.loaders.load_s3_bq import load_transactions, load_accounts, load_forex
+from include.ingestion.loaders.load_s3_bq import load_to_bq
 
 default_args = {
     "owner" : "Hannan_Razalli",
@@ -25,7 +25,7 @@ def historical_tx_to_bq():
     if keys:
         for key in keys:
             if key.endswith('.parquet'):
-                load_transactions(s3_key=key)
+                load_to_bq(s3_key=key, table_name='transactions')
 
 def historical_acc_to_bq():
     s3_hook = S3Hook(aws_conn_id='aws_default')
@@ -38,7 +38,7 @@ def historical_acc_to_bq():
     if keys:
         for key in keys:
             if key.endswith('.parquet'):
-                load_accounts(s3_key=key)
+                load_to_bq(s3_key=key, table_name='accounts')
 
 def historical_fx_to_bq():
     s3_hook = S3Hook(aws_conn_id='aws_default')
@@ -51,14 +51,15 @@ def historical_fx_to_bq():
     if keys:
         for key in keys:
             if key.endswith('.json'):
-                load_forex(s3_key=key)
+                load_to_bq(s3_key=key, table_name='forex')
 
 with DAG(
-    dag_id = '3_S3_to_BQ_Historical',
+    dag_id = 's3_to_bq_historical',
     default_args = default_args,
     schedule = None,
     start_date = datetime(2026, 5, 1),
-    catchup = False
+    catchup = False,
+    tags=['load', 'bigquery', 'historical']
 ) as dag:
     
     task_tx_to_bq = PythonOperator(

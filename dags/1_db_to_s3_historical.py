@@ -49,11 +49,12 @@ def historical_banking(date_str, **kwargs):
             )
 
 with DAG(
-    dag_id = '2_DB_to_S3_Historical',
+    dag_id = 'db_to_s3_historical',
     default_args = default_args,
     schedule = None,
     start_date = datetime(2026, 5, 1),
-    catchup = False
+    catchup = False,
+    tags=['extract', 's3', 'historical']
 ) as dag:
     
     task_fx_to_s3 = PythonOperator(
@@ -79,4 +80,6 @@ with DAG(
             }
         )
 
-        task_tx_to_s3 >> task_fx_to_s3
+        task_tx_to_s3
+
+    task_fx_to_s3
