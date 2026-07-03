@@ -10,11 +10,12 @@ default_args = {
 }
 
 with DAG(
-    dag_id='1_Postgres_Daily_Gen',
+    dag_id='generate_daily_data',
     default_args = default_args,
     schedule_interval='@daily',
     start_date=datetime(2026, 6, 5),
-    catchup=False
+    catchup=False,
+    tags=['generate', 'postgres', 'daily']
 ) as dag:
 
     run_daily_generator = PythonOperator(

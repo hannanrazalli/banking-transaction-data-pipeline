@@ -1,92 +1,105 @@
-# Data-Aware Banking Data Pipeline (Medallion Architecture)
+# Banking Transaction Data Pipeline (Medallion Architecture)
 
-## 📌 Overview
-This project is an end-to-end data engineering pipeline designed to process daily banking transactions, account statuses, and forex data. Built utilizing modern data engineering practices, the pipeline orchestrates data extraction from cloud storage (AWS S3) and performs robust transformations within Google BigQuery using a Medallion Architecture approach (Bronze -> Silver -> Gold) to serve analytical workloads.
+End-to-end data pipeline processing daily banking transactions, account changes, and forex rates. Built for a local environment using Airflow, dbt, and BigQuery with a medallion architecture (Bronze -> Silver -> Gold).
 
-## 🏗️ Architecture & Tech Stack
+## Architecture & Tech Stack
 
-![Architecture & Tech Stack](images/Architecture.png)
+![Architecture](images/Architecture.png)
 
-* **Source System (OLTP):** PostgreSQL (Local / Containerized)
-* **Orchestration:** Apache Airflow (Astronomer Cosmos)
-* **Data Warehouse:** Google BigQuery (Native Tables)
-* **Data Lake / Object Storage:** AWS S3
-* **Transformation:** dbt (Data Build Tool)
-* **Language:** Python, SQL (Jinja)
+| Component | Technology |
+|---|---|
+| Source system | PostgreSQL (containerized) |
+| Orchestration | Apache Airflow (Astronomer Cosmos) |
+| Data warehouse | Google BigQuery (native tables) |
+| Object storage | AWS S3 |
+| Transformation | dbt (Data Build Tool) |
+| Languages | Python, SQL (Jinja) |
 
-## ⚙️ Key Architectural Decisions
+## Key Design Decisions
 
-To ensure reliability, scalability, and data integrity, this pipeline incorporates several enterprise-grade design patterns:
+**1. Decoupled EL and T.** Ingestion and transformation are separate DAGs. If dbt fails (schema drift, bad data), the ingestion DAG continues landing raw data in the Bronze layer, isolating failure domains.
 
-**1. Decoupled EL & T Pipelines**
-Ingestion (Extract & Load) and Transformation workflows are physically separated into distinct DAGs. If the dbt transformation fails due to upstream schema drift, the ingestion DAG will continue to land raw data safely into the Bronze layer, improving pipeline resiliency and isolating failure domains.
+**2. Data-aware scheduling with Airflow Datasets.** The `medallion_banking` DAG triggers automatically only after the `s3_to_bq_daily` DAG completes. No cron-based polling. A gatekeeper task ensures all three load tasks succeed before emitting the dataset, preventing the dbt DAG from running on partial data.
 
-**2. Data-Aware Scheduling (Airflow Datasets)**
-Instead of relying on fragile cron-based time schedules, this pipeline utilizes Airflow Datasets. The `medallion_banking` DAG is configured to trigger automatically only after the `s3_to_bq` ingestion DAG successfully completes. This logical dependency prevents blind runs and ensures downstream models only execute when new data is physically present.
+**3. Quarantine pattern for data quality.** Corrupted records (null keys, missing amounts) are flagged in staging and routed to quarantine tables (`int_transactions_qrt`, `int_forex_qrt`) instead of being silently dropped. The Gold layer only consumes clean records.
 
-**3. Quarantine Pattern for Data Quality**
-Financial data requires strict auditing. Instead of quietly dropping null or corrupted records during staging, the pipeline evaluates data quality dynamically. Invalid records are flagged and routed into dedicated Quarantine tables (`int_transactions_qrt`, `int_forex_qrt`) in the Silver layer for auditing, ensuring the Gold layer remains pristine without losing traceability of bad data.
+**4. SCD Type 2 and idempotency.** `dim_accounts` tracks historical changes to customer attributes using surrogate keys, `valid_from`, `valid_to`, and `is_current` flags. Only records where attributes actually changed trigger a new version (no unnecessary churn). All incremental models use `MERGE` with unique keys, so re-running for the same date won't duplicate data.
 
-**4. Slowly Changing Dimensions (SCD Type 2) & Idempotency**
-* **SCD Type 2:** Customer account changes (e.g., tier upgrades, credit limit changes) are tracked historically in `dim_accounts` using surrogate keys, `valid_from`, `valid_to`, and `is_current` flags, preserving the state of the dimension at the time of any transaction.
-* **Idempotency:** `MERGE` strategies are enforced using unique composite keys across the intermediate and mart layers, preventing data duplication even if the Airflow DAG is re-run multiple times for the same execution date.
+**5. dbt tests for schema validation.** Every model has `not_null`, `unique`, and `accepted_values` tests defined in `schema.yml` files. Run `dbt test` to validate data quality across all layers.
 
-**5. Optimized BigQuery Storage**
-Avoided BigQuery External Tables for transactional data. Instead, Python's `BigQueryHook` (with `WRITE_APPEND`) is used to write data physically into BigQuery Native Tables at the Bronze layer, significantly improving query performance and reducing compute costs for downstream dbt transformations.
+**6. Native BigQuery tables.** Raw data lands in BigQuery native tables (not external tables) for better query performance and lower costs during dbt transformations.
 
-## 📂 Repository Structure
-```text
-.
-├── dags/
-│   ├── 0_banking_dag_historical.py         # Orchestrates historical mock data generation
-│   ├── 0_banking_dag_daily.py              # Orchestrates daily mock data generation
-│   ├── 1_db_to_s3_historical.py            # Extracts historical data to AWS S3
-│   ├── 1_db_to_s3_daily.py                 # Extracts daily incremental data to AWS S3
-│   ├── 2_s3_to_bq_historical.py            # Ingests historical data from S3 to BigQuery Native Tables
-│   ├── 2_s3_to_bq_daily.py                 # Ingests daily data from S3 to BigQuery (Emits Airflow Dataset)
-│   └── 3_medallion_banking.py              # Astronomer Cosmos DAG for dbt models (Data-Aware scheduling)
-├── include/
-│   ├── ingestion/                          # Custom Python loaders and extractors
-│   └── dbt/banking_data_pipeline/
-│       ├── models/
-│       │   ├── 1_staging/                  # View materializations & data cleansing
-│       │   ├── 2_intermediate/             # Incremental loads, Deduplication & Quarantine 
-│       │   └── 3_marts/                    # Gold layer (Star Schema: dim_accounts, fct_transactions)
-│       └── macros/                         # Custom Jinja macros (audit_columns, schema_name)
-├── requirements.txt                        # Python dependencies
-└── Dockerfile                              # Astro Runtime custom image
+## Repository Structure
 
 ```
+.
+├── .github/workflows/ci.yml        # PR checks: dbt compile + dbt test
+├── dags/
+│   ├── 0_generate_daily_data.py     # Mock daily data to PostgreSQL
+│   ├── 0_generate_historical_data.py# Mock historical data to PostgreSQL
+│   ├── 1_db_to_s3_daily.py          # Daily extract from Postgres to S3
+│   ├── 1_db_to_s3_historical.py     # Historical extract from Postgres to S3
+│   ├── 2_s3_to_bq_daily.py          # Daily load from S3 to BigQuery (emits Dataset)
+│   ├── 2_s3_to_bq_historical.py     # Historical load from S3 to BigQuery
+│   └── 3_medallion_banking.py       # dbt transformation DAG (Cosmos, Dataset-triggered)
+├── include/
+│   ├── ingestion/
+│   │   ├── api/                     # Forex API (daily + historical)
+│   │   ├── generators/              # PostgreSQL mock data generators
+│   │   └── loaders/                 # S3-to-BigQuery loaders
+│   └── dbt/banking_data_pipeline/
+│       ├── models/
+│       │   ├── 1_staging/           # Ephemeral: type casting + record status
+│       │   ├── 2_intermediate/      # Incremental: dedup, quarantine, FX join
+│       │   └── 3_marts/             # Incremental: star schema + aggregates
+│       ├── macros/                  # audit_columns, generate_schema_name
+│       └── tests/                   # dbt test schemas (not_null, unique, accepted_values)
+├── tests/dags/                      # Airflow DAG integrity tests (pytest)
+├── requirements.txt
+└── Dockerfile
+```
 
-## 🚀 Local Development Guide
-(Note: Executing this pipeline requires active AWS and GCP Service Account credentials.)
+## Local Development
 
-**1. Clone the repository:**
+Requires active AWS credentials (S3) and a GCP service account (BigQuery).
+
 ```bash
 git clone https://github.com/hannanrazalli/banking-transaction-data-pipeline.git
 cd banking-transaction-data-pipeline
 ```
 
-**2. Environment Variables:**
-Create a .env file in the root directory and configure your cloud credentials securely (Ensure .env is added to your .gitignore to prevent credential leaks).
+Create a `.env` file:
 
-**3. Start the Airflow Cluster:**
+```env
+AWS_ACCESS_KEY_ID=your_key
+AWS_SECRET_ACCESS_KEY=your_secret
+AWS_DEFAULT_REGION=ap-southeast-1
+S3_BUCKET_NAME=your-bucket
+GCP_PROJECT=your-project
+GCP_DATASET=bronze
+GCP_LOCATION=asia-southeast1
+FOREX_API_KEY=your_key
+IS_PRODUCTION=False
+```
+
+Start Airflow:
+
 ```bash
 astro dev start
 ```
 
-**4. Access Airflow UI:**
-Navigate to http://localhost:8080 (Default credentials: admin/admin).
+Access the UI at `http://localhost:8080` (admin/admin).
 
+## CI
 
-## 📊 Pipeline Visualizations & Proof of Execution
+This project uses GitHub Actions to run `dbt compile` and `dbt test` on every pull request, catching SQL errors and schema violations before merge.
 
-### 1. dbt Medallion Architecture Lineage Graph
-This graph illustrates the modular dependency and data flow from raw staging tables to downstream analytical marts inside Google BigQuery:
+## Pipeline Visualizations
 
-![dbt Medallion Lineage Graph](images/Medallion.png)
+### dbt Lineage
 
-### 2. Orchestration DAGs (Successful Runs)
-Proof of execution for all historical and daily pipeline DAGs running successfully within the local Astro Runtime environment:
+![dbt Lineage](images/Medallion.png)
 
-![Airflow DAG Success Run](images/Airflow_DAG.png)
+### Airflow DAGs
+
+![Airflow DAGs](images/Airflow_DAG.png)

@@ -12,7 +12,7 @@ models:
     
     1_staging:
       +schema: bronze
-      +materialized: view
+      +materialized: ephemeral
 
     2_intermediate:
       +schema: silver

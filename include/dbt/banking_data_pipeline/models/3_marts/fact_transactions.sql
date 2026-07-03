@@ -27,8 +27,7 @@ final_fact AS (
         original_amount,
         original_currency,
         exchange_rate_to_usd,
-        
-        ROUND(CAST(original_amount * exchange_rate_to_usd AS FLOAT64), 2) AS amount_usd,
+        amount_usd,
         
         _refined_at,
         {{ audit_columns('gold') }}

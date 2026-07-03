@@ -10,11 +10,12 @@ default_args = {
 }
 
 with DAG(
-    dag_id='1_Postgres_Historical_Gen',
+    dag_id='generate_historical_data',
     default_args = default_args,
     schedule=None,
     start_date=datetime(2026, 5, 1),
-    catchup=False
+    catchup=False,
+    tags=['generate', 'postgres', 'historical']
 ) as dag:
 
     run_historical_generator = PythonOperator(
@@ -22,7 +23,7 @@ with DAG(
         python_callable=historical_to_postgres,
         op_kwargs={
             'start_date': '2026-05-01',
-            'end_date': '2026-06-05'
+            'end_date': '2026-06-09'
         }
     )
 

@@ -1,7 +1,6 @@
-{{ config(materialized='incremental') }}
-
 WITH raw_data AS (
-    SELECT * FROM {{ source('banking_raw', 'raw_accounts') }}
+    SELECT * 
+    FROM {{ source('banking_raw', 'raw_accounts') }}
 )
 
 SELECT
