@@ -35,13 +35,13 @@ End-to-end data pipeline processing daily banking transactions, account changes,
 .
 ├── .github/workflows/ci.yml        # PR checks: dbt compile + dbt test
 ├── dags/
-│   ├── 0_generate_daily_data.py     # Mock daily data to PostgreSQL
-│   ├── 0_generate_historical_data.py# Mock historical data to PostgreSQL
-│   ├── 1_db_to_s3_daily.py          # Daily extract from Postgres to S3
-│   ├── 1_db_to_s3_historical.py     # Historical extract from Postgres to S3
-│   ├── 2_s3_to_bq_daily.py          # Daily load from S3 to BigQuery (emits Dataset)
-│   ├── 2_s3_to_bq_historical.py     # Historical load from S3 to BigQuery
-│   └── 3_medallion_banking.py       # dbt transformation DAG (Cosmos, Dataset-triggered)
+│   ├── 0_banking_dag_daily.py      # [0_generate_daily_data] Mock daily data to PostgreSQL
+│   ├── 0_banking_dag_historical.py # [0_generate_historical_data] Mock historical data
+│   ├── 1_db_to_s3_daily.py         # [1_db_to_s3_daily] Daily extract Postgres to S3
+│   ├── 1_db_to_s3_historical.py    # [1_db_to_s3_historical] Historical extract to S3
+│   ├── 2_s3_to_bq_daily.py         # [2_s3_to_bq_daily] Load S3 to BigQuery (emits Dataset)
+│   ├── 2_s3_to_bq_historical.py    # [2_s3_to_bq_historical] Historical load to BigQuery
+│   └── 3_medallion_banking.py      # [3_medallion_banking] dbt transform (Dataset-triggered)
 ├── include/
 │   ├── ingestion/
 │   │   ├── api/                     # Forex API (daily + historical)

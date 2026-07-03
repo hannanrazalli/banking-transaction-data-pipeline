@@ -10,10 +10,10 @@ default_args = {
 }
 
 with DAG(
-    dag_id='generate_daily_data',
+    dag_id='0_generate_daily_data',
     default_args = default_args,
     schedule_interval='@daily',
-    start_date=datetime(2026, 6, 5),
+    start_date=datetime(2026, 6, 1),
     catchup=False,
     tags=['generate', 'postgres', 'daily']
 ) as dag:

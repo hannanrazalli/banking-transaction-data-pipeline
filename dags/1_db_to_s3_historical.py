@@ -15,8 +15,8 @@ default_args = {
     'retries' : 2
 }
 
-START_DATE = '2026-5-1'
-END_DATE = '2026-6-9'
+START_DATE = '2026-6-1'
+END_DATE = '2026-7-1'
 POSTGRES_CONN = os.getenv("POSTGRES_CONN_ID", "postgres_default")
 AWS_CONN = os.getenv("AWS_CONN_ID", "aws_default")
 BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
@@ -49,10 +49,10 @@ def historical_banking(date_str, **kwargs):
             )
 
 with DAG(
-    dag_id = 'db_to_s3_historical',
+    dag_id = '1_db_to_s3_historical',
     default_args = default_args,
     schedule = None,
-    start_date = datetime(2026, 5, 1),
+    start_date = datetime(2026, 6, 1),
     catchup = False,
     tags=['extract', 's3', 'historical']
 ) as dag:

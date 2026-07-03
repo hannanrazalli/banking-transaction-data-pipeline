@@ -71,10 +71,10 @@ def daily_fx_to_bq(ds, **kwargs):
                 load_to_bq(s3_key=key, table_name='forex')
 
 with DAG(
-    dag_id = 's3_to_bq_daily',
+    dag_id = '2_s3_to_bq_daily',
     default_args = default_args,
     schedule = '@daily',
-    start_date = datetime(2026, 5, 1),
+    start_date = datetime(2026, 6, 1),
     catchup = False,
     tags=['load', 'bigquery', 'daily']
 ) as dag:
