@@ -4,7 +4,7 @@
     {%- if custom_schema_name is none -%}
         {{ default_schema }}
     {%- else -%}
-        cuba explain{%- if target.name == 'prod' -%}
+        {%- if target.name == 'prod' -%}
             {{ custom_schema_name | trim }}_prod
         {%- else -%}
             {{ custom_schema_name | trim }}

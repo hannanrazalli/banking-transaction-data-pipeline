@@ -1,7 +1,3 @@
-{{ config(
-    materialized='incremental'
-) }}
-
 WITH silver_forex AS (
     SELECT * FROM {{ ref('int_forex_refined') }}
 ),

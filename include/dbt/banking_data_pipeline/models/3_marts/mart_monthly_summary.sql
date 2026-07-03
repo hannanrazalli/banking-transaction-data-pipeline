@@ -1,9 +1,14 @@
 {{ config(
-    materialized='table'
+    materialized='incremental',
+    unique_key=['transaction_month', 'original_currency'],
+    incremental_strategy='merge'
 ) }}
 
 WITH fact_data AS (
     SELECT * FROM {{ ref('fact_transactions') }}
+    {% if is_incremental() %}
+        WHERE _refined_at > (SELECT COALESCE(MAX(_marts_at), CAST('1900-01-01' AS TIMESTAMP)) FROM {{ this }})
+    {% endif %}
 )
 
 SELECT 

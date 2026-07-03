@@ -7,6 +7,12 @@ WITH clean_data AS (
     SELECT *
     FROM {{ ref('stg_forex') }}
     WHERE _record_status = 'CLEAN'
+    {% if is_incremental() %}
+        AND _ingest_at > (
+            SELECT COALESCE(TIMESTAMP_SUB(MAX(_ingest_at), INTERVAL 1 HOUR), CAST('1900-01-01' AS TIMESTAMP))
+            FROM {{ this }}
+        )
+    {% endif %}
 ),
 
 deduped_data AS (
