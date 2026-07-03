@@ -9,8 +9,11 @@ from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 logger = logging.getLogger(__name__)
 
 def historical_forex(start_date: str, end_date: str, run_id: str):
-    s3_hook = S3Hook(aws_conn_id='aws_default')
+    aws_conn_id = os.getenv("AWS_CONN_ID", "aws_default")
+    s3_hook = S3Hook(aws_conn_id=aws_conn_id)
     bucket_name = os.getenv("S3_BUCKET_NAME")
+    if bucket_name is None:
+        raise ValueError("S3_BUCKET_NAME environment variable is not set")
     dates = pd.date_range(start=start_date, end=end_date)
 
     for dt in dates:
@@ -18,7 +21,7 @@ def historical_forex(start_date: str, end_date: str, run_id: str):
         url = f"https://api.frankfurter.dev/v2/rates?date={date_str}&base=USD"
 
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout=30)
             response.raise_for_status()
             data = response.json()
 

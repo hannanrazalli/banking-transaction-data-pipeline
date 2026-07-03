@@ -1,5 +1,6 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+import os
 from datetime import datetime
 from include.ingestion.generators.postgres_historical import historical_to_postgres
 
@@ -15,15 +16,16 @@ with DAG(
     schedule=None,
     start_date=datetime(2026, 6, 1),
     catchup=False,
-    tags=['generate', 'postgres', 'historical']
+    tags=["banking", "medallion"]
 ) as dag:
 
     run_historical_generator = PythonOperator(
         task_id='Populate_Historical_Postgres',
         python_callable=historical_to_postgres,
         op_kwargs={
-            'start_date': '2026-06-01',
-            'end_date': '2026-07-01'
+            'start_date': os.getenv("HISTORICAL_START_DATE", "2026-06-01"),
+            'end_date': os.getenv("HISTORICAL_END_DATE", "2026-07-01"),
+            'postgres_conn_id': os.getenv("POSTGRES_CONN_ID", "postgres_default")
         }
     )
 

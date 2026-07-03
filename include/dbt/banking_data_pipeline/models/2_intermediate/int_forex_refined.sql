@@ -1,5 +1,6 @@
 {{ config(
     materialized='incremental',
+    unique_key=['forex_date', 'base_currency'],
     on_schema_change='append_new_columns'
 ) }}
 
@@ -21,4 +22,7 @@ deduped_data AS (
     QUALIFY ROW_NUMBER() OVER (PARTITION BY forex_date, base_currency ORDER BY _ingest_at DESC) = 1
 )
 
-SELECT * FROM deduped_data
+SELECT
+    *,
+    {{ audit_columns('silver') }}
+FROM deduped_data

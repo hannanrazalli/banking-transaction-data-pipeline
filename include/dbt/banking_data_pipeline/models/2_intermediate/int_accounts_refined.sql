@@ -15,8 +15,13 @@ WITH source_data AS (
     {% endif %}
 ),
 
-deduplicate AS (
+clean_data AS (
     SELECT * FROM source_data
+    WHERE _record_status = 'CLEAN'
+),
+
+deduplicate AS (
+    SELECT * FROM clean_data
     QUALIFY ROW_NUMBER() OVER(PARTITION BY account_id ORDER BY updated_at DESC, _ingest_at DESC) = 1
 ),
 
@@ -35,4 +40,3 @@ final_staged AS (
 )
 
 SELECT * FROM final_staged
-WHERE _record_status = 'CLEAN'

@@ -27,11 +27,11 @@ def daily_banking(execution_date, **kwargs):
 
     for table in tables:
         if table == 'accounts':
-            query = f"SELECT * FROM accounts WHERE DATE(updated_at) = '{execution_date}'"
+            query = "SELECT * FROM accounts WHERE DATE(updated_at) = %s"
         else:
-            query = f"SELECT * FROM transactions WHERE DATE(transaction_date) = '{execution_date}'"
+            query = "SELECT * FROM transactions WHERE DATE(transaction_date) = %s"
 
-        df = pg_hook.get_pandas_df(query)
+        df = pg_hook.get_pandas_df(query, parameters=(execution_date,))
 
         if not df.empty:
             parquet_buffer = io.BytesIO()
@@ -52,7 +52,7 @@ with DAG(
     schedule = '@daily',
     start_date = datetime(2026, 6, 1),
     catchup = False,
-    tags=['extract', 's3', 'daily']
+    tags=["banking", "medallion"]
 ) as dag:
     
     task_fx_to_s3 = PythonOperator(
@@ -66,12 +66,11 @@ with DAG(
     )
 
     task_tx_to_s3 = PythonOperator(
-        task_id = f'TX_to_S3_Daily',
+        task_id = 'TX_to_S3_Daily',
         python_callable = daily_banking,
         op_kwargs = {
             'execution_date' : '{{ ds }}'
         }
     )
 
-    task_tx_to_s3
-    task_fx_to_s3
+    task_tx_to_s3 >> task_fx_to_s3

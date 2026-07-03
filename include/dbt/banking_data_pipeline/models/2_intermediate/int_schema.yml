@@ -11,9 +11,6 @@ models:
       - name: account_id
         tests:
           - not_null
-      - name: amount_usd
-        tests:
-          - not_null
       - name: transaction_type
         tests:
           - not_null

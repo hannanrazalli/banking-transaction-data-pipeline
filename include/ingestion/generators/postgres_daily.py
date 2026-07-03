@@ -6,8 +6,8 @@ from airflow.providers.postgres.hooks.postgres import PostgresHook
 
 logger = logging.getLogger(__name__)
 
-def daily_to_postgres(execution_date: str) -> None:
-    pg_hook = PostgresHook(postgres_conn_id='postgres_default')
+def daily_to_postgres(execution_date: str, postgres_conn_id: str = 'postgres_default') -> None:
+    pg_hook = PostgresHook(postgres_conn_id=postgres_conn_id)
     
     account_pool = [f"ACC_{1000 + i}" for i in range(1000)]
     status_pool = ["ACTIVE", "SUSPENDED", "DORMANT", "VIP"]

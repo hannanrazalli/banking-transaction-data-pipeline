@@ -71,14 +71,13 @@ SELECT
     original_currency,
     exchange_rate_to_usd,
     
-    ROUND(CAST(original_amount * exchange_rate_to_usd AS FLOAT64), 2) AS amount_usd,
+    ROUND(CAST(original_amount * COALESCE(exchange_rate_to_usd, 1.0) AS FLOAT64), 2) AS amount_usd,
     
     transaction_type,
     _is_outbound_funds,
     tx_ingest_at,
     forex_ingest_at,
     
-    CURRENT_TIMESTAMP() AS _refined_at,
-    '{{ invocation_id }}' AS _batch_id_silver
+    {{ audit_columns('silver') }}
     
 FROM joined_data

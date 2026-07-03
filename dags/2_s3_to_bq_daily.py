@@ -7,10 +7,7 @@ Description:
     automatically trigger downstream dbt transformations (Medallion architecture).
 """
 
-import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-
 from datetime import datetime
 from airflow import DAG
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
@@ -76,22 +73,25 @@ with DAG(
     schedule = '@daily',
     start_date = datetime(2026, 6, 1),
     catchup = False,
-    tags=['load', 'bigquery', 'daily']
+    tags=["banking", "medallion"]
 ) as dag:
     
     task_tx_daily = PythonOperator(
         task_id = 'load_daily_transactions_to_bq',
-        python_callable = daily_tx_to_bq
+        python_callable = daily_tx_to_bq,
+        op_kwargs={'ds': '{{ ds }}'}
     )
 
     task_acc_daily = PythonOperator(
         task_id = 'load_daily_accounts_to_bq',
-        python_callable = daily_acc_to_bq
+        python_callable = daily_acc_to_bq,
+        op_kwargs={'ds': '{{ ds }}'}
     )
 
     task_fx_daily = PythonOperator(
         task_id = 'load_daily_forex_to_bq',
-        python_callable = daily_fx_to_bq
+        python_callable = daily_fx_to_bq,
+        op_kwargs={'ds': '{{ ds }}'}
     )
 
     gatekeeper = EmptyOperator(

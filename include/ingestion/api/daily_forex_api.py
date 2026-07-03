@@ -8,12 +8,15 @@ from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 logger = logging.getLogger(__name__)
 
 def daily_forex(execution_date: str, api_key: str, run_id: str):
-    s3_hook = S3Hook(aws_conn_id='aws_default')
+    aws_conn_id = os.getenv("AWS_CONN_ID", "aws_default")
+    s3_hook = S3Hook(aws_conn_id=aws_conn_id)
     bucket_name = os.getenv("S3_BUCKET_NAME")
+    if bucket_name is None:
+        raise ValueError("S3_BUCKET_NAME environment variable is not set")
     url = f"https://v6.exchangerate-api.com/v6/{api_key}/latest/USD"
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=30)
         response.raise_for_status()
         data = response.json()
 

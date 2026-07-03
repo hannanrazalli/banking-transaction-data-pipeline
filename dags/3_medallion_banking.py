@@ -48,12 +48,13 @@ dbtdag = DbtDag(
         dbt_deps=True
     ),
     schedule=[bq_raw_ready],
-    start_date=datetime(2026, 5, 1),
+    start_date=datetime(2026, 6, 1),
     catchup=False,
     dag_id="3_medallion_banking",
-    tags=['transform', 'dbt', 'medallion'],
+    tags=["banking", "medallion"],
     default_args={
         "owner" : "Hannan_Razalli",
+        "depends_on_past" : False,
         "retries" : 2
     }
 )

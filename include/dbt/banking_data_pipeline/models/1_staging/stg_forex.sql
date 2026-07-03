@@ -37,6 +37,9 @@ SELECT
         WHEN forex_date IS NULL THEN 'CORRUPT'
         WHEN base_currency IS NULL THEN 'CORRUPT'
         WHEN exchange_rate_myr IS NULL OR exchange_rate_myr <= 0 THEN 'CORRUPT'
+        WHEN exchange_rate_sgd IS NULL OR exchange_rate_sgd <= 0 THEN 'CORRUPT'
+        WHEN exchange_rate_eur IS NULL OR exchange_rate_eur <= 0 THEN 'CORRUPT'
+        WHEN exchange_rate_gbp IS NULL OR exchange_rate_gbp <= 0 THEN 'CORRUPT'
         ELSE 'CLEAN'
     END AS _record_status,
 

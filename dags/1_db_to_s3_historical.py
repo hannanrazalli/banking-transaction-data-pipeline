@@ -15,8 +15,8 @@ default_args = {
     'retries' : 2
 }
 
-START_DATE = '2026-6-1'
-END_DATE = '2026-7-1'
+START_DATE = os.getenv("HISTORICAL_START_DATE", "2026-06-01")
+END_DATE = os.getenv("HISTORICAL_END_DATE", "2026-07-01")
 POSTGRES_CONN = os.getenv("POSTGRES_CONN_ID", "postgres_default")
 AWS_CONN = os.getenv("AWS_CONN_ID", "aws_default")
 BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
@@ -29,11 +29,11 @@ def historical_banking(date_str, **kwargs):
 
     for table in tables:
         if table == 'accounts':
-            query = f"SELECT * FROM accounts WHERE DATE(updated_at) = '{date_str}'"
+            query = "SELECT * FROM accounts WHERE DATE(updated_at) = %s"
         else:
-            query = f"SELECT * FROM transactions WHERE DATE(transaction_date) = '{date_str}'"
+            query = "SELECT * FROM transactions WHERE DATE(transaction_date) = %s"
 
-        df = pg_hook.get_pandas_df(query)
+        df = pg_hook.get_pandas_df(query, parameters=(date_str,))
 
         if not df.empty:
             parquet_buffer = io.BytesIO()
@@ -54,7 +54,7 @@ with DAG(
     schedule = None,
     start_date = datetime(2026, 6, 1),
     catchup = False,
-    tags=['extract', 's3', 'historical']
+    tags=["banking", "medallion"]
 ) as dag:
     
     task_fx_to_s3 = PythonOperator(
@@ -69,17 +69,17 @@ with DAG(
 
     historical_dates = pd.date_range(start=START_DATE, end=END_DATE)
 
+    historical_tx_tasks = []
     for dt in historical_dates:
         current_date_str = dt.strftime('%Y-%m-%d')
 
-        task_tx_to_s3 = PythonOperator(
+        task = PythonOperator(
             task_id = f'TX_to_S3_Historical_{current_date_str}',
             python_callable = historical_banking,
             op_kwargs = {
                 'date_str' : current_date_str
             }
         )
+        historical_tx_tasks.append(task)
 
-        task_tx_to_s3
-
-    task_fx_to_s3
+    historical_tx_tasks >> task_fx_to_s3
