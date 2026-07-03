@@ -53,7 +53,7 @@ End-to-end data pipeline processing daily banking transactions, account changes,
 │       │   ├── 2_intermediate/      # Incremental: dedup, quarantine, FX join
 │       │   └── 3_marts/             # Incremental: star schema + aggregates
 │       ├── macros/                  # audit_columns, generate_schema_name
-│       └── tests/                   # dbt test schemas (not_null, unique, accepted_values)
+│       └── tests/                   # dbt singular tests (optional; schema tests in *schema.yml)
 ├── tests/dags/                      # Airflow DAG integrity tests (pytest)
 ├── requirements.txt
 └── Dockerfile
